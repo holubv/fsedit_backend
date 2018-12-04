@@ -84,8 +84,8 @@ class Pdo implements AdapterInterface
     public function lockTree()
     {
         $options = $this->getOptions();
-        $sql = 'SELECT ' . $this->quoteIdentifier($options->getIdColumnName())
-            . ' FROM ' . $this->quoteIdentifier($options->getTableName())
+        $sql = 'SELECT ' . $options->getIdColumnName()
+            . ' FROM ' . $options->getTableName()
             . ' FOR UPDATE';
         $this->executeSQL($sql);
     }
@@ -96,16 +96,6 @@ class Pdo implements AdapterInterface
     public function getOptions()
     {
         return $this->options;
-    }
-
-    /**
-     * @param string $columnName
-     * @return string
-     * @todo remove this method
-     */
-    public function quoteIdentifier($columnName)
-    {
-        return $columnName;
     }
 
     /**
@@ -129,16 +119,15 @@ class Pdo implements AdapterInterface
     public function update($nodeId, array $data)
     {
         $options = $this->getOptions();
-        $adapter = $this;
         $data = $this->cleanData($data);
-        $setPart = array_map(function ($item) use ($adapter) {
-            return $adapter->quoteIdentifier($item) . ' = :' . $item;
+        $setPart = array_map(function ($item) {
+            return $item . ' = :' . $item;
         }, array_keys($data));
-        $sql = 'UPDATE ' . $adapter->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET ' . implode(', ', $setPart)
-            . ' WHERE ' . $adapter->quoteIdentifier($options->getIdColumnName()) . ' = :__nodeID';
+            . ' WHERE ' . $options->getIdColumnName() . ' = :__nodeID';
         $data['__nodeID'] = $nodeId;
-        $adapter->executeSQL($sql, $data);
+        $this->executeSQL($sql, $data);
     }
 
     /**
@@ -172,7 +161,6 @@ class Pdo implements AdapterInterface
     public function insert(NodeInfo $nodeInfo, array $data)
     {
         $options = $this->getOptions();
-        $adapter = $this;
         $data[$options->getParentIdColumnName()] = $nodeInfo->getParentId();
         $data[$options->getLevelColumnName()] = $nodeInfo->getLevel();
         $data[$options->getLeftColumnName()] = $nodeInfo->getLeft();
@@ -180,16 +168,16 @@ class Pdo implements AdapterInterface
         if ($options->getScopeColumnName()) {
             $data[$options->getScopeColumnName()] = $nodeInfo->getScope();
         }
-        $columns = array_map(function ($item) use ($adapter) {
-            return $adapter->quoteIdentifier($item);
+        $columns = array_map(function ($item) {
+            return $item;
         }, array_keys($data));
         $values = array_map(function ($item) {
             return ':' . $item;
         }, array_keys($data));
-        $sql = 'INSERT INTO ' . $adapter->quoteIdentifier($options->getTableName())
+        $sql = 'INSERT INTO ' . $options->getTableName()
             . ' (' . implode(', ', $columns) . ')'
             . ' VALUES(' . implode(', ', $values) . ')';
-        return $adapter->executeInsertSQL($sql, $data);
+        return $this->executeInsertSQL($sql, $data);
     }
 
     /**
@@ -224,8 +212,8 @@ class Pdo implements AdapterInterface
     public function delete($nodeId)
     {
         $options = $this->getOptions();
-        $sql = 'DELETE FROM ' . $this->quoteIdentifier($options->getTableName())
-            . ' WHERE ' . $this->quoteIdentifier($options->getIdColumnName()) . ' = :__nodeID';
+        $sql = 'DELETE FROM ' . $options->getTableName()
+            . ' WHERE ' . $options->getIdColumnName() . ' = :__nodeID';
         $params = [
             '__nodeID' => $nodeId,
         ];
@@ -248,14 +236,14 @@ class Pdo implements AdapterInterface
             ':shift' => $shift,
             ':fromIndex' => $fromIndex,
         ];
-        $sql = 'UPDATE ' . $this->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' = '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' + :shift'
+            . $options->getLeftColumnName() . ' = '
+            . $options->getLeftColumnName() . ' + :shift'
             . ' WHERE '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' > :fromIndex';
+            . $options->getLeftColumnName() . ' > :fromIndex';
         if ($options->getScopeColumnName()) {
-            $sql .= ' AND ' . $this->quoteIdentifier($options->getScopeColumnName()) . ' = :__scope';
+            $sql .= ' AND ' . $options->getScopeColumnName() . ' = :__scope';
             $params['__scope'] = $scope;
         }
         $this->executeSQL($sql, $params);
@@ -277,14 +265,14 @@ class Pdo implements AdapterInterface
             ':shift' => $shift,
             ':fromIndex' => $fromIndex,
         ];
-        $sql = 'UPDATE ' . $this->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET '
-            . $this->quoteIdentifier($options->getRightColumnName()) . ' = '
-            . $this->quoteIdentifier($options->getRightColumnName()) . ' + :shift'
+            . $options->getRightColumnName() . ' = '
+            . $options->getRightColumnName() . ' + :shift'
             . ' WHERE '
-            . $this->quoteIdentifier($options->getRightColumnName()) . ' > :fromIndex';
+            . $options->getRightColumnName() . ' > :fromIndex';
         if ($options->getScopeColumnName()) {
-            $sql .= ' AND ' . $this->quoteIdentifier($options->getScopeColumnName()) . ' = :__scope';
+            $sql .= ' AND ' . $options->getScopeColumnName() . ' = :__scope';
             $params['__scope'] = $scope;
         }
         $this->executeSQL($sql, $params);
@@ -298,9 +286,9 @@ class Pdo implements AdapterInterface
     public function updateParentId($nodeId, $newParentId)
     {
         $options = $this->getOptions();
-        $sql = 'UPDATE ' . $this->quoteIdentifier($options->getTableName())
-            . ' SET ' . $this->quoteIdentifier($options->getParentIdColumnName()) . ' = :__parentId'
-            . ' WHERE ' . $this->quoteIdentifier($options->getIdColumnName()) . ' = :__nodeId';
+        $sql = 'UPDATE ' . $options->getTableName()
+            . ' SET ' . $options->getParentIdColumnName() . ' = :__parentId'
+            . ' WHERE ' . $options->getIdColumnName() . ' = :__nodeId';
         $params = [
             '__parentId' => $newParentId,
             '__nodeId' => $nodeId,
@@ -326,15 +314,15 @@ class Pdo implements AdapterInterface
             ':leftFrom' => $leftIndexFrom,
             ':rightTo' => $rightIndexTo,
         ];
-        $sql = 'UPDATE ' . $this->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET '
-            . $this->quoteIdentifier($options->getLevelColumnName()) . ' = '
-            . $this->quoteIdentifier($options->getLevelColumnName()) . ' + :shift'
+            . $options->getLevelColumnName() . ' = '
+            . $options->getLevelColumnName() . ' + :shift'
             . ' WHERE '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' >= :leftFrom'
-            . ' AND ' . $this->quoteIdentifier($options->getRightColumnName()) . ' <= :rightTo';
+            . $options->getLeftColumnName() . ' >= :leftFrom'
+            . ' AND ' . $options->getRightColumnName() . ' <= :rightTo';
         if ($options->getScopeColumnName()) {
-            $sql .= ' AND ' . $this->quoteIdentifier($options->getScopeColumnName()) . ' = :__scope';
+            $sql .= ' AND ' . $options->getScopeColumnName() . ' = :__scope';
             $binds['__scope'] = $scope;
         }
         $this->executeSQL($sql, $binds);
@@ -358,17 +346,17 @@ class Pdo implements AdapterInterface
             ':leftFrom' => $leftIndexFrom,
             ':rightTo' => $rightIndexTo,
         ];
-        $sql = 'UPDATE ' . $this->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' = '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' + :shift, '
-            . $this->quoteIdentifier($options->getRightColumnName()) . ' = '
-            . $this->quoteIdentifier($options->getRightColumnName()) . ' + :shift'
+            . $options->getLeftColumnName() . ' = '
+            . $options->getLeftColumnName() . ' + :shift, '
+            . $options->getRightColumnName() . ' = '
+            . $options->getRightColumnName() . ' + :shift'
             . ' WHERE '
-            . $this->quoteIdentifier($options->getLeftColumnName()) . ' >= :leftFrom'
-            . ' AND ' . $this->quoteIdentifier($options->getRightColumnName()) . ' <= :rightTo';
+            . $options->getLeftColumnName() . ' >= :leftFrom'
+            . ' AND ' . $options->getRightColumnName() . ' <= :rightTo';
         if ($options->getScopeColumnName()) {
-            $sql .= ' AND ' . $this->quoteIdentifier($options->getScopeColumnName()) . ' = :__scope';
+            $sql .= ' AND ' . $options->getScopeColumnName() . ' = :__scope';
             $binds['__scope'] = $scope;
         }
         $this->executeSQL($sql, $binds);
@@ -386,7 +374,7 @@ class Pdo implements AdapterInterface
             '__nodeID' => $nodeId,
         ];
         $sql = $this->getDefaultDbSelect();
-        $sql .= ' WHERE ' . $this->quoteIdentifier($this->addTableName($options->getIdColumnName())) . ' = :__nodeID';
+        $sql .= ' WHERE ' . $this->addTableName($options->getIdColumnName()) . ' = :__nodeID';
         $result = $this->executeSelectSQL($sql, $params);
         return (0 < count($result)) ? $result[0] : null;
     }
@@ -406,7 +394,7 @@ class Pdo implements AdapterInterface
      */
     public function getBlankDbSelect()
     {
-        return 'SELECT * FROM ' . $this->quoteIdentifier($this->getOptions()->getTableName()) . ' ';
+        return 'SELECT * FROM ' . $this->getOptions()->getTableName() . ' ';
     }
 
     private function addTableName($value)
@@ -440,9 +428,9 @@ class Pdo implements AdapterInterface
             '__parentID' => $parentNodeId,
         ];
         $sql = 'SELECT *'
-            . ' FROM ' . $this->quoteIdentifier($this->getOptions()->getTableName())
-            . ' WHERE ' . $this->quoteIdentifier($this->addTableName($options->getParentIdColumnName())) . ' = :__parentID'
-            . ' ORDER BY ' . $this->quoteIdentifier($this->addTableName($options->getLeftColumnName())) . ' ASC';
+            . ' FROM ' . $this->getOptions()->getTableName()
+            . ' WHERE ' . $this->addTableName($options->getParentIdColumnName()) . ' = :__parentID'
+            . ' ORDER BY ' . $this->addTableName($options->getLeftColumnName()) . ' ASC';
         $data = $this->executeSelectSQL($sql, $params);
         $result = [];
         foreach ($data as $nodeData) {
@@ -480,21 +468,20 @@ class Pdo implements AdapterInterface
      */
     public function updateNodeMetadata(NodeInfo $nodeInfo)
     {
-        $adapter = $this;
         $options = $this->getOptions();
         $data = [
             $options->getRightColumnName() => $nodeInfo->getRight(),
             $options->getLeftColumnName() => $nodeInfo->getLeft(),
             $options->getLevelColumnName() => $nodeInfo->getLevel(),
         ];
-        $setPart = array_map(function ($item) use ($adapter) {
-            return $adapter->quoteIdentifier($item) . ' = :' . $item;
+        $setPart = array_map(function ($item) {
+            return $item . ' = :' . $item;
         }, array_keys($data));
-        $sql = 'UPDATE ' . $adapter->quoteIdentifier($options->getTableName())
+        $sql = 'UPDATE ' . $options->getTableName()
             . ' SET ' . implode(', ', $setPart)
-            . ' WHERE ' . $adapter->quoteIdentifier($options->getIdColumnName()) . ' = :__nodeID';
+            . ' WHERE ' . $options->getIdColumnName() . ' = :__nodeID';
         $data['__nodeID'] = $nodeInfo->getId();
-        $adapter->executeSQL($sql, $data);
+        $this->executeSQL($sql, $data);
     }
 
     /**
@@ -523,31 +510,30 @@ class Pdo implements AdapterInterface
         if (!$nodeInfo = $this->getNodeInfo($nodeId)) {
             return [];
         }
-        $adapter = $this;
         $sql = $this->getDefaultDbSelect();
         $params = [];
         $wherePart = [];
         if ($options->getScopeColumnName()) {
-            $wherePart[] = $adapter->quoteIdentifier($this->addTableName($options->getScopeColumnName())) . ' = :__scope';
+            $wherePart[] = $this->addTableName($options->getScopeColumnName()) . ' = :__scope';
             $params['__scope'] = $nodeInfo->getScope();
         }
         if (0 != $startLevel) {
-            $wherePart[] = $adapter->quoteIdentifier($this->addTableName($options->getLevelColumnName())) . ' >= :__level';
+            $wherePart[] = $this->addTableName($options->getLevelColumnName()) . ' >= :__level';
             $params['__level'] = $nodeInfo->getLevel() + $startLevel;
         }
         if (null != $levels) {
-            $wherePart[] = $adapter->quoteIdentifier($this->addTableName($options->getLevelColumnName())) . ' < :__endLevel';
+            $wherePart[] = $this->addTableName($options->getLevelColumnName()) . ' < :__endLevel';
             $params['__endLevel'] = $nodeInfo->getLevel() + $startLevel + abs($levels);
         }
         if (null != $excludeBranch && null != ($excludeNodeInfo = $this->getNodeInfo($excludeBranch))) {
             $wherePart[] = '( '
-                . $adapter->quoteIdentifier($this->addTableName($options->getLeftColumnName())) . ' BETWEEN :__l1 AND :__p1'
+                . $this->addTableName($options->getLeftColumnName()) . ' BETWEEN :__l1 AND :__p1'
                 . ' OR '
-                . $adapter->quoteIdentifier($this->addTableName($options->getLeftColumnName())) . ' BETWEEN :__l2 AND :__p2'
+                . $this->addTableName($options->getLeftColumnName()) . ' BETWEEN :__l2 AND :__p2'
                 . ') AND ('
-                . $adapter->quoteIdentifier($this->addTableName($options->getRightColumnName())) . ' BETWEEN :__l3 AND :__p3'
+                . $this->addTableName($options->getRightColumnName()) . ' BETWEEN :__l3 AND :__p3'
                 . ' OR '
-                . $adapter->quoteIdentifier($this->addTableName($options->getRightColumnName())) . ' BETWEEN :__l4 AND :__p4'
+                . $this->addTableName($options->getRightColumnName()) . ' BETWEEN :__l4 AND :__p4'
                 . ')';
             $params['__l1'] = $nodeInfo->getLeft();
             $params['__p1'] = $excludeNodeInfo->getLeft() - 1;
@@ -558,14 +544,14 @@ class Pdo implements AdapterInterface
             $params['__l4'] = $nodeInfo->getLeft();
             $params['__p4'] = $excludeNodeInfo->getLeft() - 1;
         } else {
-            $wherePart[] = $adapter->quoteIdentifier($this->addTableName($options->getLeftColumnName())) . ' >= :__left'
-                . ' AND ' . $adapter->quoteIdentifier($this->addTableName($options->getRightColumnName())) . ' <= :__right';
+            $wherePart[] = $this->addTableName($options->getLeftColumnName()) . ' >= :__left'
+                . ' AND ' . $this->addTableName($options->getRightColumnName()) . ' <= :__right';
             $params['__left'] = $nodeInfo->getLeft();
             $params['__right'] = $nodeInfo->getRight();
         }
         $sql .= ' WHERE ' . implode(' AND ', $wherePart);
-        $sql .= ' ORDER BY ' . $adapter->quoteIdentifier($this->addTableName($options->getLeftColumnName())) . ' ASC';
-        $result = $adapter->executeSelectSQL($sql, $params);
+        $sql .= ' ORDER BY ' . $this->addTableName($options->getLeftColumnName()) . ' ASC';
+        $result = $this->executeSelectSQL($sql, $params);
         return (0 < count($result)) ? $result : [];
     }
 
@@ -580,7 +566,7 @@ class Pdo implements AdapterInterface
             '__nodeID' => $nodeId,
         ];
         $sql = $this->getBlankDbSelect();
-        $sql .= ' WHERE ' . $this->quoteIdentifier($this->addTableName($options->getIdColumnName())) . ' = :__nodeID';
+        $sql .= ' WHERE ' . $this->addTableName($options->getIdColumnName()) . ' = :__nodeID';
         $array = $this->executeSelectSQL($sql, $params);
         $result = ($array) ? $this->_buildNodeInfoObject($array[0]) : null;
         return $result;
@@ -605,12 +591,12 @@ class Pdo implements AdapterInterface
         $options = $this->getOptions();
         $params = [];
         $sql = $this->getBlankDbSelect();
-        $sql .= ' WHERE ' . $this->quoteIdentifier($this->addTableName($options->getParentIdColumnName())) . ' IS NULL';
+        $sql .= ' WHERE ' . $this->addTableName($options->getParentIdColumnName()) . ' IS NULL';
         if (null != $scope && $options->getScopeColumnName()) {
-            $sql .= ' AND ' . $this->quoteIdentifier($this->addTableName($options->getScopeColumnName())) . ' = :__scope';
+            $sql .= ' AND ' . $this->addTableName($options->getScopeColumnName()) . ' = :__scope';
             $params['__scope'] = $scope;
         }
-        $sql .= ' ORDER BY ' . $this->quoteIdentifier($this->addTableName($options->getIdColumnName())) . ' ASC';
+        $sql .= ' ORDER BY ' . $this->addTableName($options->getIdColumnName()) . ' ASC';
         return $this->executeSelectSQL($sql, $params);
     }
 }
