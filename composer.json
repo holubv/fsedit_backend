@@ -1,0 +1,18 @@
+{
+  "require": {
+    "php": ">=5.6.0",
+    "slim/slim": "^3.11",
+    "catfan/Medoo": "^1.6",
+    "zeuxisoo/slim-whoops": "0.6.*",
+    "ext-json": "*",
+    "dyorg/slim-token-authentication": "^0.3.3",
+    "stefano/stefano-tree": "^2.0",
+    "paragonie/random_compat": "^2.0",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "FSEdit\\": "src/FSEdit"
+    }
+  }
+}
