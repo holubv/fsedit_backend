@@ -6,7 +6,7 @@ namespace FSEdit;
 
 class Utils
 {
-    const KEY_SPACE = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const KEY_SPACE = '0123456789abcdefghijklmnopqrstuvwxyz';
 
     /**
      * Generate a random string, using a cryptographically secure
@@ -20,7 +20,7 @@ class Utils
     {
         $pieces = [];
         for ($i = 0; $i < $length; ++$i) {
-            $pieces[] = self::KEY_SPACE[random_int(0, 61)];
+            $pieces[] = self::KEY_SPACE[random_int(0, 35)];
         }
         return implode('', $pieces);
     }
