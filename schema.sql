@@ -1,5 +1,5 @@
 -- we don't know how to generate schema fsedit (class Schema) :(
-create or replace table if not exists users
+create table users
 (
   id       int auto_increment
     primary key,
@@ -9,7 +9,7 @@ create or replace table if not exists users
   unique (email)
 );
 
-create or replace table if not exists sessions
+create table sessions
 (
   user_id int                                   not null,
   token   char(64)                              not null,
@@ -22,7 +22,7 @@ create or replace table if not exists sessions
 create index sessions_token_index
   on sessions (token);
 
-create or replace table if not exists workspaces
+create table workspaces
 (
   id         int auto_increment
     primary key,
@@ -38,7 +38,7 @@ create or replace table if not exists workspaces
     on delete cascade
 );
 
-create or replace table if not exists file_tree
+create table file_tree
 (
   id           int auto_increment
     primary key,
