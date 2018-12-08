@@ -15,9 +15,9 @@ class UserController extends Controller
         $tree = new FileTree($pdo);
 
         return $this->json($res, [
-            'token' => Utils::random_str(64),
-            'hash' => Utils::random_str(14),
-            'file' => sha1(microtime(true) . mt_rand(10000, 90000)),
+            'token' => Utils::randomStr(64),
+            'hash' => Utils::randomStr(14),
+            'file' => Utils::randomSha1(),
         ]);
     }
 }

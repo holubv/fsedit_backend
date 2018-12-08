@@ -13,6 +13,8 @@ class Controller
     /** @var  Medoo */
     protected $database = null;
 
+    protected $config;
+
     public function __construct(Container $container)
     {
         $this->container = $container;
@@ -20,6 +22,8 @@ class Controller
         if ($container->has('database')) {
             $this->database = $this->container->get('database');
         }
+
+        $this->config = $this->container->get('config');
     }
 
     protected function json(Response $res, $data, $status = null)

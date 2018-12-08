@@ -16,12 +16,21 @@ class Utils
      *
      * @return string random string
      */
-    public static function random_str($length)
+    public static function randomStr($length)
     {
         $pieces = [];
-        for ($i = 0; $i < $length; ++$i) {
-            $pieces[] = self::KEY_SPACE[random_int(0, 35)];
+        try {
+            for ($i = 0; $i < $length; ++$i) {
+                $pieces[] = self::KEY_SPACE[random_int(0, 35)];
+            }
+        } catch (\Exception $e) {
+            throw new \Error($e->getMessage());
         }
         return implode('', $pieces);
+    }
+
+    public static function randomSha1()
+    {
+        return sha1(microtime(true) . mt_rand(10000, 90000));
     }
 }
