@@ -29,8 +29,23 @@ class Utils
         return implode('', $pieces);
     }
 
+    /**
+     * @return string
+     */
     public static function randomSha1()
     {
         return sha1(microtime(true) . mt_rand(10000, 90000));
+    }
+
+    /**
+     * @param array $arr
+     * @return mixed|null
+     */
+    public static function arrLast($arr)
+    {
+        if (!$arr) {
+            return null;
+        }
+        return $arr[count($arr) - 1];
     }
 }

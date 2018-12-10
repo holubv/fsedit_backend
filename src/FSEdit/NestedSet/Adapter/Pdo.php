@@ -397,7 +397,7 @@ class Pdo implements AdapterInterface
         return 'SELECT * FROM ' . $this->getOptions()->getTableName() . ' ';
     }
 
-    private function addTableName($value)
+    public function addTableName($value)
     {
         return sprintf('%s.%s', $this->getOptions()->getTableName(), $value);
     }

@@ -15,6 +15,11 @@ $app->add(function ($req, $res, $next) {
 });
 
 $app->map(['post', 'options'],'/upload', FSEdit\FileController::class . ':upload');
+$app->get('/file/{file}', FSEdit\FileController::class . ':readFile');
+$app->get('/file', FSEdit\FileController::class . ':readFile');
+
+$app->get('/workspace/structure', FSEdit\WorkspaceController::class . ':structure');
+
 $app->get('/users/login', FSEdit\UserController::class . ':login');
 $app->get('/users/register', FSEdit\UserController::class . ':register');
 $app->get('/users/logout', FSEdit\UserController::class . ':logout');
