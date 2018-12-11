@@ -42,7 +42,7 @@ class WorkspaceController extends Controller
             $st = [];
         }
 
-        return $this->json($res, $st[0]['children']);
+        return $this->json($res, $st);
     }
 
     private static function cleanStructure(&$elements)
