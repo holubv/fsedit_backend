@@ -31,6 +31,8 @@ class WorkspaceController extends Controller
         }
 
         self::cleanStructure($structure);
+        self::generatePaths($structure);
+
         $st = self::buildTree($structure);
         $st = self::nestedValues($st);
         //todo cleanup
@@ -48,9 +50,45 @@ class WorkspaceController extends Controller
     private static function cleanStructure(&$elements)
     {
         foreach ($elements as &$element) {
+            $element['id'] = (int) $element['id'];
+            $element['parent_id'] = (int) $element['parent_id'];
+            $element['level'] = (int) $element['level'];
             unset($element['lft']);
             unset($element['rgt']);
             unset($element['workspace_id']);
+        }
+    }
+
+    private static function generatePaths(&$elements)
+    {
+        foreach ($elements as &$element) {
+            if ($element['level'] === 0) {
+                $element['path'] = null;
+                continue;
+            }
+            if ($element['level'] === 1) {
+                $element['path'] = [$element['name']];
+                continue;
+            }
+            $path = [];
+            $parent = $element['id'];
+            while ($parent) {
+                $found = false;
+                foreach ($elements as $e) {
+                    if ($e['id'] === $parent) {
+                        if ($e['name']) {
+                            $path[] = $e['name'];
+                        }
+                        $parent = $e['parent_id'];
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    break;
+                }
+            }
+            $element['path'] = array_reverse($path);
         }
     }
 
