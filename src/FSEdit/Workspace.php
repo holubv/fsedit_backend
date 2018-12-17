@@ -154,4 +154,14 @@ class Workspace
     {
         return true; //todo check permissions
     }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
 }

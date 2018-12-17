@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "workspace_id": "1",
+    "lft": "1",
+    "rgt": "16",
+    "parent_id": null,
+    "level": "0",
+    "name": null,
+    "file": null
+  },
+  {
+    "id": "2",
+    "workspace_id": "1",
+    "lft": "2",
+    "rgt": "7",
+    "parent_id": "1",
+    "level": "1",
+    "name": "folder1",
+    "file": null
+  },
+  {
+    "id": "5",
+    "workspace_id": "1",
+    "lft": "3",
+    "rgt": "4",
+    "parent_id": "2",
+    "level": "2",
+    "name": "file1",
+    "file": "cebcc0acf2c895dd77225d4830220f968dfebbf2"
+  },
+  {
+    "id": "6",
+    "workspace_id": "1",
+    "lft": "5",
+    "rgt": "6",
+    "parent_id": "2",
+    "level": "2",
+    "name": "file2",
+    "file": "76fa0813922e9cf7ecf1eefb4a2f8872f26587ca"
+  },
+  {
+    "id": "3",
+    "workspace_id": "1",
+    "lft": "8",
+    "rgt": "13",
+    "parent_id": "1",
+    "level": "1",
+    "name": "folder2",
+    "file": null
+  },
+  {
+    "id": "7",
+    "workspace_id": "1",
+    "lft": "9",
+    "rgt": "12",
+    "parent_id": "3",
+    "level": "2",
+    "name": "folder4",
+    "file": null
+  },
+  {
+    "id": "8",
+    "workspace_id": "1",
+    "lft": "10",
+    "rgt": "11",
+    "parent_id": "7",
+    "level": "3",
+    "name": "file3",
+    "file": "bf10567440d058413789469e7960d53ac6f3f9d6"
+  },
+  {
+    "id": "4",
+    "workspace_id": "1",
+    "lft": "14",
+    "rgt": "15",
+    "parent_id": "1",
+    "level": "1",
+    "name": "folder3",
+    "file": null
+  }
+]

@@ -131,10 +131,83 @@ class FileController extends Controller
     }
 
     /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
+    public function create(Request $req, Response $res)
+    {
+        $name = $req->getParam('name', 'unnamed');
+        $wHash = $req->getParam('workspace', null);
+        $wHash = 'bbmte6u2uo0lq3'; //todo remove this
+        if (!$wHash) {
+            throw new \Exception('workspace is missing');
+        }
+        $parent = $req->getParam('parent', null);
+        $isFolder = $req->getParam('folder', false) === 'true';
+
+        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace->canWriteEx();
+
+        $tree = $workspace->getFileTree();
+        $rootId = (int)$workspace->getRootNode()['id'];
+        if (!$parent) {
+            $parent = $rootId;
+        }
+
+        $parentNode = $tree->getNode($parent);
+        if (!$parentNode || ((int)$parentNode['workspace_id']) !== $workspace->getId()) {
+            //parent id is not from this workspace, prevent editing different ws
+            throw new \Exception('invalid parent id');
+        }
+
+        //todo check name duplicity
+
+        if ($isFolder) {
+            $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name]);
+            return $this->json($res, [
+                'id' => $id,
+                'name' => $name,
+                'file' => null
+            ]);
+        }
+
+        $hash = Utils::randomSha1();
+
+        $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name, 'file' => $hash]);
+        if (!$this->completeUpload(null, $hash)) {
+            throw new \Exception('cannot complete file upload');
+        }
+
+        return $this->json($res, [
+            'parent' => $parent !== $rootId ? $parent : null,
+            'id' => $id,
+            'file' => $hash,
+            'name' => $name
+        ]);
+    }
+
+    public function move(Request $req, Response $res)
+    {
+
+    }
+
+    public function rename(Request $req, Response $res)
+    {
+
+    }
+
+    public function edit(Request $req, Response $res)
+    {
+
+    }
+
+    /**
      * @param string $hash
      * @return string
      */
-    public function getFilePath($hash)
+    private function getFilePath($hash)
     {
         $pre = substr($hash, 0, 8);
         $pre = chunk_split($pre, 2, '/');
@@ -142,7 +215,12 @@ class FileController extends Controller
         return ROOT . $this->config->uploadsDir . '/' . $pre . $hash;
     }
 
-    private function completeUpload(UploadedFileInterface $file, $hash)
+    /**
+     * @param UploadedFileInterface|null $file
+     * @param $hash
+     * @return bool
+     */
+    private function completeUpload($file, $hash)
     {
         $pre = substr($hash, 0, 8);
         $pre = chunk_split($pre, 2, '/');
@@ -157,10 +235,19 @@ class FileController extends Controller
             }
         }
 
-        try {
-            $file->moveTo($path . $hash);
-        } catch (\Exception $e) {
-            return false;
+        if ($file) {
+            try {
+                $file->moveTo($path . $hash);
+            } catch (\Exception $e) {
+                return false;
+            }
+        } else {
+            $file = fopen($path . $hash, 'w');
+            if ($file !== false) {
+                fclose($file);
+            } else {
+                return false;
+            }
         }
 
         return true;

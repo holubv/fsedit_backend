@@ -117,13 +117,13 @@ class WorkspaceController extends Controller
     private static function nestedValues($arr)
     {
         usort($arr, function ($a, $b) {
-            if (isset($a['children']) && !isset($b['children'])) {
-                return -1;
-            }
-            if (!isset($a['children']) && isset($b['children'])) {
+            if (isset($a['file']) && !isset($b['file'])) {
                 return 1;
             }
-            return strcmp($a['name'], $b['name']);
+            if (!isset($a['file']) && isset($b['file'])) {
+                return -1;
+            }
+            return strcmp(mb_strtolower($a['name']), mb_strtolower($b['name']));
         });
         foreach ($arr as &$element) {
             if (isset($element['children'])) {
