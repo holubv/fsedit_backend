@@ -128,7 +128,8 @@ class WorkspaceController extends Controller
         foreach ($arr as &$element) {
             if (isset($element['children'])) {
                 $element['children'] = self::nestedValues($element['children']);
-            } else {
+            }
+            if (isset($element['file'])) {
                 $element['droppable'] = false;
             }
         }
