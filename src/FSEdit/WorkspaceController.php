@@ -2,6 +2,7 @@
 
 namespace FSEdit;
 
+use FSEdit\Exception\BadRequestException;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -18,7 +19,7 @@ class WorkspaceController extends Controller
     {
         $wHash = $args['workspace'];
         if (!$wHash) {
-            throw new \Exception('workspace hash is missing');
+            throw new BadRequestException('workspace hash is missing');
         }
 
         $workspace = Workspace::getByHash($this->database, $wHash);

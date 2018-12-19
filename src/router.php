@@ -6,6 +6,7 @@ $app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app, [
 ]));
 
 $app->add(new \FSEdit\DatabaseMiddleware($app));
+$app->add(new \FSEdit\StatusExceptionMiddleware($app));
 
 $app->add(function ($req, $res, $next) {
     return $next($req, $res

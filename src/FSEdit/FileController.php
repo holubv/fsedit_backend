@@ -2,6 +2,8 @@
 
 namespace FSEdit;
 
+use FSEdit\Exception\BadRequestException;
+use FSEdit\Exception\NotFoundException;
 use Psr\Http\Message\UploadedFileInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -28,12 +30,12 @@ class FileController extends Controller
         }
         $name = $req->getParam('name', null);
         if (!$name) {
-            throw new \Exception('filename is missing');
+            throw new BadRequestException('filename is missing');
         }
         $wHash = $req->getParam('workspace', null);
         $wHash = 'bbmte6u2uo0lq3'; //todo remove this
         if (!$wHash) {
-            throw new \Exception('workspace is missing');
+            throw new BadRequestException('workspace is missing');
         }
 
         $workspace = Workspace::getByHash($this->database, $wHash);
@@ -105,13 +107,13 @@ class FileController extends Controller
         if (!$hash) {
             $hash = isset($args['file']) ? $args['file'] : null;
             if (!$hash) {
-                throw new \Exception('file code is missing');
+                throw new BadRequestException('file code is missing');
             }
         }
 
         $node = $this->database->get('file_tree', '*', ['file' => $hash]);
         if (!$node) {
-            return $res->withStatus(404);
+            throw new NotFoundException();
         }
 
         $workspace = Workspace::getById($this->database, $node['workspace_id']);
@@ -119,7 +121,7 @@ class FileController extends Controller
 
         $path = $this->getFilePath($hash);
         if (!file_exists($path)) {
-            return $res->withStatus(404);
+            throw new NotFoundException();
         }
 
         $fh = fopen($path, 'rb');
@@ -142,7 +144,7 @@ class FileController extends Controller
         $wHash = $req->getParam('workspace', null);
         $wHash = 'bbmte6u2uo0lq3'; //todo remove this
         if (!$wHash) {
-            throw new \Exception('workspace is missing');
+            throw new BadRequestException('workspace is missing');
         }
         $parent = $req->getParam('parent', null);
         $isFolder = $req->getParam('folder', false) === 'true';
@@ -159,10 +161,18 @@ class FileController extends Controller
         $parentNode = $tree->getNode($parent);
         if (!$parentNode || ((int)$parentNode['workspace_id']) !== $workspace->getId()) {
             //parent id is not from this workspace, prevent editing different ws
-            throw new \Exception('invalid parent id');
+            throw new BadRequestException('invalid parent id');
         }
 
-        //todo check name duplicity
+        //check name duplicity
+        $existing = $this->database->get('file_tree', 'id', [
+            'workspace_id' => $workspace->getId(),
+            'parent_id' => $parent,
+            'name' => $name
+        ]);
+        if ($existing) {
+            throw new BadRequestException('item name already exists under this parent');
+        }
 
         if ($isFolder) {
             $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name]);

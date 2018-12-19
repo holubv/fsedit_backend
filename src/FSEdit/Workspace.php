@@ -2,6 +2,7 @@
 
 namespace FSEdit;
 
+use FSEdit\Exception\NotFoundException;
 use Medoo\Medoo;
 
 class Workspace
@@ -75,7 +76,7 @@ class Workspace
         }
         $result = $this->database->get('workspaces', '*', $where);
         if (!$result) {
-            throw new \RuntimeException('workspace not found');
+            throw new NotFoundException('workspace not found');
         }
 
         $this->id = (int)$result['id'];
