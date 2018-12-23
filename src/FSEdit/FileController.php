@@ -124,6 +124,13 @@ class FileController extends Controller
             throw new NotFoundException();
         }
 
+        $lastModified = filemtime($path);
+        $eTag = md5_file($path);
+
+        $res = $res
+            ->withHeader('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified) . ' GMT')
+            ->withHeader('ETag', $eTag);
+
         $fh = fopen($path, 'rb');
         $stream = new Stream($fh);
         return $res
