@@ -53,6 +53,30 @@ class Workspace
 
     /**
      * @param Medoo $database
+     * @return Workspace
+     * @throws \Exception
+     */
+    public static function create($database)
+    {
+        $hash = Utils::randomStr(14);
+        $editToken = Utils::randomSha1();
+
+        $database->insert('workspaces', [
+            'hash' => $hash,
+            'edit_token' => $editToken
+        ]);
+
+        if ($database->error()[0] != 0) {
+            throw new \Exception('database error');
+        }
+
+        $workspace = self::getById($database, $database->id());
+        $workspace->getFileTree()->createRootNode([], $workspace->id);
+        return $workspace;
+    }
+
+    /**
+     * @param Medoo $database
      * @param string $hash
      * @return Workspace
      */
@@ -164,5 +188,20 @@ class Workspace
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEditToken()
+    {
+        return $this->edit_token;
+    }
 
 }

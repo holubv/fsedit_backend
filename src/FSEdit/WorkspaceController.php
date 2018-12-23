@@ -8,6 +8,24 @@ use Slim\Http\Response;
 
 class WorkspaceController extends Controller
 {
+
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @param array $args
+     * @return Response
+     * @throws \Exception
+     */
+    public function create(Request $req, Response $res, $args)
+    {
+        $workspace = Workspace::create($this->database);
+
+        return $this->json($res, [
+            'hash' => $workspace->getHash(),
+            'editToken' => $workspace->getEditToken()
+        ]);
+    }
+
     /**
      * @param Request $req
      * @param Response $res

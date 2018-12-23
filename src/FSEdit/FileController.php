@@ -3,6 +3,7 @@
 namespace FSEdit;
 
 use FSEdit\Exception\BadRequestException;
+use FSEdit\Exception\ConflictException;
 use FSEdit\Exception\NotFoundException;
 use Psr\Http\Message\UploadedFileInterface;
 use Slim\Http\Request;
@@ -33,7 +34,6 @@ class FileController extends Controller
             throw new BadRequestException('filename is missing');
         }
         $wHash = $req->getParam('workspace', null);
-        $wHash = 'bbmte6u2uo0lq3'; //todo remove this
         if (!$wHash) {
             throw new BadRequestException('workspace is missing');
         }
@@ -142,7 +142,6 @@ class FileController extends Controller
     {
         $name = $req->getParam('name', 'unnamed');
         $wHash = $req->getParam('workspace', null);
-        $wHash = 'bbmte6u2uo0lq3'; //todo remove this
         if (!$wHash) {
             throw new BadRequestException('workspace is missing');
         }
@@ -171,7 +170,7 @@ class FileController extends Controller
             'name' => $name
         ]);
         if ($existing) {
-            throw new BadRequestException('item name already exists under this parent');
+            throw new ConflictException('item name already exists under this parent');
         }
 
         if ($isFolder) {
