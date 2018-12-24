@@ -8,7 +8,9 @@
     "dyorg/slim-token-authentication": "^0.3.3",
     "stefano/stefano-tree": "^2.0",
     "paragonie/random_compat": "^2.0",
-    "ext-pdo": "*"
+    "neitanod/forceutf8": "~2.0",
+    "ext-pdo": "*",
+    "ext-iconv": "*"
   },
   "autoload": {
     "psr-4": {

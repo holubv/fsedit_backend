@@ -87,6 +87,8 @@ class FileController extends Controller
             throw new \Exception('cannot complete file upload');
         }
 
+        Utils::convertFileToUTF8($this->getFilePath($hash)); //todo handle images
+
         return $this->json($res, [
             'parent' => $parent !== $rootId ? $parent : null,
             'file' => $hash,

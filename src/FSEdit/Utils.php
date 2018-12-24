@@ -3,6 +3,7 @@
 
 namespace FSEdit;
 
+use ForceUTF8\Encoding;
 
 class Utils
 {
@@ -47,5 +48,26 @@ class Utils
             return null;
         }
         return $arr[count($arr) - 1];
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     * @throws \Exception
+     */
+    public static function convertFileToUTF8($path)
+    {
+        $string = file_get_contents($path);
+        if ($string === false) {
+            throw new \Exception('cannot read file');
+        }
+        if (mb_check_encoding($string, 'UTF-8')) {
+            return false;
+        }
+        $string = Encoding::toUTF8($string);
+        if (file_put_contents($path, $string) === false) {
+            throw new \Exception('cannot write to file');
+        }
+        return true;
     }
 }
