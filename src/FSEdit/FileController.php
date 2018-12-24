@@ -126,17 +126,18 @@ class FileController extends Controller
             throw new NotFoundException();
         }
 
-        $lastModified = filemtime($path);
         $eTag = md5_file($path);
 
-        $res = $res
-            ->withHeader('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified) . ' GMT')
-            ->withHeader('ETag', $eTag);
+        $presentETag = $req->getHeader('If-None-Match');
+        if ($presentETag && $presentETag[0] === $eTag) {
+            return $res->withStatus(304);
+        }
 
         $fh = fopen($path, 'rb');
         $stream = new Stream($fh);
         return $res
             ->withHeader('Content-Type', 'text/plain')
+            ->withHeader('ETag', $eTag)
             //->withHeader('Content-Type', 'image/jpeg') //todo recognize images
             ->withBody($stream);
     }
@@ -216,9 +217,43 @@ class FileController extends Controller
 
     }
 
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
     public function edit(Request $req, Response $res)
     {
+        $fileId = (int)$req->getParam('file');
+        if ($fileId <= 0) {
+            throw new BadRequestException('invalid file id');
+        }
+        $wHash = $req->getParam('workspace');
+        if (!$wHash) {
+            throw new BadRequestException('workspace is missing');
+        }
 
+        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace->canWriteEx();
+
+        $file = $this->database->get('file_tree', ['id', 'workspace_id', 'file'], [
+            'id' => $fileId,
+            'file[!]' => null
+        ]);
+        if (!$file || $file['workspace_id'] != $workspace->getId()) {
+            throw new NotFoundException('file not found');
+        }
+        $hash = $file['file'];
+        $path = $this->getFilePath($hash);
+
+        //todo check file size
+
+        if (file_put_contents($path, $req->getBody()) === false) {
+            throw new \Exception('cannot write to file');
+        }
+
+        return $this->json($res, []);
     }
 
     /**
