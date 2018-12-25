@@ -207,9 +207,57 @@ class FileController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
     public function move(Request $req, Response $res)
     {
+        $itemId = (int)$req->getParam('id');
+        if ($itemId <= 0) {
+            throw new BadRequestException('invalid item id');
+        }
+        $parentId = (int)$req->getParam('parent', 0);
+        if ($parentId < 0) {
+            throw new BadRequestException('invalid parent id');
+        }
+        $wHash = $req->getParam('workspace');
+        if (!$wHash) {
+            throw new BadRequestException('workspace is missing');
+        }
 
+        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace->canWriteEx();
+
+        $tree = $workspace->getFileTree();
+
+        $item = $this->database->get('file_tree', ['id'], [
+            'id' => $itemId,
+            'workspace_id' => $workspace->getId()
+        ]);
+        if (!$item) {
+            throw new NotFoundException('item not found');
+        }
+
+        $parent = null;
+        if ($parentId) {
+            $parent = $this->database->get('file_tree', ['id'], [
+                'id' => $parentId,
+                'workspace_id' => $workspace->getId(),
+                'file' => null //must be folder
+            ]);
+        } else {
+            $parent = $workspace->getRootNode();
+        }
+
+        if (!$parent) {
+            throw new NotFoundException('parent folder node not found');
+        }
+
+        $tree->moveNodePlacementChildBottom((int)$item['id'], (int)$parent['id']);
+        return $this->json($res, []);
     }
 
     public function rename(Request $req, Response $res)
@@ -239,9 +287,10 @@ class FileController extends Controller
 
         $file = $this->database->get('file_tree', ['id', 'workspace_id', 'file'], [
             'id' => $fileId,
+            'workspace_id' => $workspace->getId(),
             'file[!]' => null
         ]);
-        if (!$file || $file['workspace_id'] != $workspace->getId()) {
+        if (!$file) {
             throw new NotFoundException('file not found');
         }
         $hash = $file['file'];
