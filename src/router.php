@@ -28,7 +28,7 @@ $app->get('/file/{file:[0-9a-fA-F]+}', FSEdit\FileController::class . ':readFile
 $app->get('/file', FSEdit\FileController::class . ':readFile');
 
 $app->post('/workspaces/create', FSEdit\WorkspaceController::class . ':create');
-$app->get('/workspace/{workspace:[0-9a-zA-Z]+}/structure', FSEdit\WorkspaceController::class . ':structure');
+$app->get('/workspace/{workspace:[0-9a-zA-Z]+}', FSEdit\WorkspaceController::class . ':structure');
 
 $app->get('/users/login', FSEdit\UserController::class . ':login');
 $app->get('/users/register', FSEdit\UserController::class . ':register');
