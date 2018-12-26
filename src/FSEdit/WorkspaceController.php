@@ -40,7 +40,7 @@ class WorkspaceController extends Controller
             throw new BadRequestException('workspace hash is missing');
         }
 
-        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canReadEx();
 
         $structure = $workspace->getStructure();

@@ -38,7 +38,7 @@ class FileController extends Controller
             throw new BadRequestException('workspace is missing');
         }
 
-        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $hash = Utils::randomSha1();
@@ -118,7 +118,7 @@ class FileController extends Controller
             throw new NotFoundException();
         }
 
-        $workspace = Workspace::getById($this->database, $node['workspace_id']);
+        $workspace = new Workspace($this->database, $node['workspace_id']);
         $workspace->canReadEx();
 
         $path = $this->getFilePath($hash);
@@ -158,7 +158,7 @@ class FileController extends Controller
         $parent = $req->getParam('parent', null);
         $isFolder = $req->getParam('folder', false) === 'true';
 
-        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $tree = $workspace->getFileTree();
@@ -228,7 +228,7 @@ class FileController extends Controller
             throw new BadRequestException('workspace is missing');
         }
 
-        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $tree = $workspace->getFileTree();
@@ -282,7 +282,7 @@ class FileController extends Controller
             throw new BadRequestException('workspace is missing');
         }
 
-        $workspace = Workspace::getByHash($this->database, $wHash);
+        $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $file = $this->database->get('file_tree', ['id', 'workspace_id', 'file'], [

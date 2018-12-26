@@ -2,20 +2,11 @@
 
 namespace FSEdit;
 
-use FSEdit\Exception\NotFoundException;
 use Medoo\Medoo;
 
-class Workspace
+class Workspace extends Model
 {
-    /**
-     * @var Medoo $database
-     */
-    private $database;
-
-    /**
-     * @var int $id
-     */
-    private $id;
+    protected static $tableName = 'workspaces';
     /**
      * @var int $user_id
      */
@@ -43,15 +34,6 @@ class Workspace
     private $__tree = null;
 
     /**
-     * Workspace constructor.
-     * @param Medoo $database
-     */
-    private function __construct($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
      * @param Medoo $database
      * @return Workspace
      * @throws \Exception
@@ -70,57 +52,21 @@ class Workspace
             throw new \Exception('database error');
         }
 
-        $workspace = self::getById($database, $database->id());
+        $workspace = new Workspace($database, $database->id());
         $workspace->getFileTree()->createRootNode([], $workspace->id);
         return $workspace;
     }
 
     /**
-     * @param Medoo $database
      * @param string $hash
-     * @return Workspace
+     * @return $this
      */
-    public static function getByHash($database, $hash)
+    public function loadByHash($hash)
     {
         if (!$hash) {
             throw new \InvalidArgumentException('no workspace hash is specified');
         }
-        $w = new Workspace($database);
-        $w->load(['hash' => $hash]);
-        return $w;
-    }
-
-    /**
-     * @param array $where
-     */
-    private function load($where)
-    {
-        if (!$where) {
-            throw new \InvalidArgumentException('no where clause is specified');
-        }
-        $result = $this->database->get('workspaces', '*', $where);
-        if (!$result) {
-            throw new NotFoundException('workspace not found');
-        }
-
-        $this->id = (int)$result['id'];
-        $this->user_id = (int)$result['user_id'];
-        $this->hash = $result['hash'];
-        $this->created = $result['created'];
-        $this->private = !!$result['private'];
-        $this->edit_token = $result['edit_token'];
-    }
-
-    /**
-     * @param Medoo $database
-     * @param int $id
-     * @return Workspace
-     */
-    public static function getById($database, $id)
-    {
-        $w = new Workspace($database);
-        $w->load(['id' => (int)$id]);
-        return $w;
+        return $this->load(['hash' => $hash]);
     }
 
     public function getStructure($rootId = null)
@@ -204,4 +150,13 @@ class Workspace
         return $this->edit_token;
     }
 
+    protected function mapFields($result)
+    {
+        $this->id = (int)$result['id'];
+        $this->user_id = (int)$result['user_id'];
+        $this->hash = $result['hash'];
+        $this->created = $result['created'];
+        $this->private = !!$result['private'];
+        $this->edit_token = $result['edit_token'];
+    }
 }
