@@ -90,7 +90,7 @@ class FileController extends Controller
         Utils::convertFileToUTF8($this->getFilePath($hash)); //todo handle images
 
         return $this->json($res, [
-            'parent' => $parent !== $rootId ? $parent : null,
+            'parent' => $parent !== $rootId ? (int)$parent : null,
             'file' => $hash,
             'name' => $filename
         ]);
@@ -200,8 +200,8 @@ class FileController extends Controller
         }
 
         return $this->json($res, [
-            'parent' => $parent !== $rootId ? $parent : null,
-            'id' => $id,
+            'parent' => $parent !== $rootId ? (int)$parent : null,
+            'id' => (int)$id,
             'file' => $hash,
             'name' => $name
         ]);
