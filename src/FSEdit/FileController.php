@@ -32,7 +32,7 @@ class FileController extends Controller
         $name = $this->requireParam($req, 'name');
         $wHash = $this->requireParam($req, 'workspace');
 
-        $workspace = (new Workspace($this->database))->loadByHash($wHash);
+        $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $hash = Utils::randomSha1();
@@ -112,7 +112,7 @@ class FileController extends Controller
             throw new NotFoundException();
         }
 
-        $workspace = new Workspace($this->database, $node['workspace_id']);
+        $workspace = $this->Workspace($node['workspace_id']);
         $workspace->canReadEx();
 
         $path = $this->getFilePath($hash);
@@ -149,7 +149,7 @@ class FileController extends Controller
         $parent = $req->getParam('parent', null);
         $isFolder = $req->getParam('folder', false) === 'true';
 
-        $workspace = (new Workspace($this->database))->loadByHash($wHash);
+        $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $tree = $workspace->getFileTree();
@@ -216,7 +216,7 @@ class FileController extends Controller
         }
         $wHash = $this->requireParam($req, 'workspace');
 
-        $workspace = (new Workspace($this->database))->loadByHash($wHash);
+        $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $tree = $workspace->getFileTree();
@@ -267,7 +267,7 @@ class FileController extends Controller
         }
         $wHash = $this->requireParam($req, 'workspace');
 
-        $workspace = (new Workspace($this->database))->loadByHash($wHash);
+        $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canWriteEx();
 
         $file = $this->database->get('file_tree', ['id', 'workspace_id', 'file'], [

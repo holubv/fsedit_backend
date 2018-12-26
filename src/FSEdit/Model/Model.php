@@ -1,6 +1,6 @@
 <?php
 
-namespace FSEdit;
+namespace FSEdit\Model;
 
 use FSEdit\Exception\NotFoundException;
 use Medoo\Medoo;

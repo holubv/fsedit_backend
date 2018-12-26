@@ -1,7 +1,9 @@
 <?php
 
-namespace FSEdit;
+namespace FSEdit\Model;
 
+use FSEdit\FileTree;
+use FSEdit\Utils;
 use Medoo\Medoo;
 
 class Workspace extends Model

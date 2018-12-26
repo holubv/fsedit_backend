@@ -4,6 +4,8 @@ namespace FSEdit;
 
 use FSEdit\Exception\BadRequestException;
 use FSEdit\Exception\UnauthorizedException;
+use FSEdit\Model\ModelFactory;
+use FSEdit\Model\User;
 use Medoo\Medoo;
 use Slim\Container;
 use Slim\Http\Request;
@@ -11,6 +13,8 @@ use Slim\Http\Response;
 
 class Controller
 {
+    use ModelFactory;
+
     /** @var Container */
     protected $container;
     /** @var Medoo */
@@ -79,4 +83,8 @@ class Controller
         return $this->user;
     }
 
+    protected function getDatabase()
+    {
+        return $this->database;
+    }
 }

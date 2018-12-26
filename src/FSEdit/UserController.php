@@ -13,7 +13,8 @@ class UserController extends Controller
      */
     public function login($req, $res)
     {
-
+        $email = $this->requireParam($req, 'email');
+        $password = $this->requireParam($req, 'password');
     }
 
     /**

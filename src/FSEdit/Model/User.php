@@ -1,6 +1,6 @@
 <?php
 
-namespace FSEdit;
+namespace FSEdit\Model;
 
 class User extends Model
 {

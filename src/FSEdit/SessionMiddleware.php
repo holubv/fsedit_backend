@@ -3,6 +3,7 @@
 namespace FSEdit;
 
 use FSEdit\Exception\UnauthorizedException;
+use FSEdit\Model\User;
 use Medoo\Medoo;
 use Slim\App;
 use Slim\Container;
