@@ -186,7 +186,7 @@ class FileController extends Controller
         if ($isFolder) {
             $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name]);
             return $this->json($res, [
-                'id' => $id,
+                'id' => (int)$id,
                 'name' => $name,
                 'file' => null
             ]);
