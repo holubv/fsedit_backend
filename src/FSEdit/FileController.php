@@ -29,14 +29,8 @@ class FileController extends Controller
         if ($file->getError() !== UPLOAD_ERR_OK) {
             throw new \Exception('upload error');
         }
-        $name = $req->getParam('name', null);
-        if (!$name) {
-            throw new BadRequestException('filename is missing');
-        }
-        $wHash = $req->getParam('workspace', null);
-        if (!$wHash) {
-            throw new BadRequestException('workspace is missing');
-        }
+        $name = $this->requireParam($req, 'name');
+        $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
@@ -150,11 +144,8 @@ class FileController extends Controller
      */
     public function create(Request $req, Response $res)
     {
-        $name = $req->getParam('name', 'unnamed');
-        $wHash = $req->getParam('workspace', null);
-        if (!$wHash) {
-            throw new BadRequestException('workspace is missing');
-        }
+        $name = $this->requireParam($req, 'name');
+        $wHash = $this->requireParam($req, 'workspace');
         $parent = $req->getParam('parent', null);
         $isFolder = $req->getParam('folder', false) === 'true';
 
@@ -223,10 +214,7 @@ class FileController extends Controller
         if ($parentId < 0) {
             throw new BadRequestException('invalid parent id');
         }
-        $wHash = $req->getParam('workspace');
-        if (!$wHash) {
-            throw new BadRequestException('workspace is missing');
-        }
+        $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();
@@ -277,10 +265,7 @@ class FileController extends Controller
         if ($fileId <= 0) {
             throw new BadRequestException('invalid file id');
         }
-        $wHash = $req->getParam('workspace');
-        if (!$wHash) {
-            throw new BadRequestException('workspace is missing');
-        }
+        $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = (new Workspace($this->database))->loadByHash($wHash);
         $workspace->canWriteEx();

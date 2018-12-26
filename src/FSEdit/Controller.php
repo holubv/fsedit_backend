@@ -2,9 +2,11 @@
 
 namespace FSEdit;
 
+use FSEdit\Exception\BadRequestException;
 use FSEdit\Exception\UnauthorizedException;
 use Medoo\Medoo;
 use Slim\Container;
+use Slim\Http\Request;
 use Slim\Http\Response;
 
 class Controller
@@ -46,6 +48,24 @@ class Controller
     protected function json(Response $res, $data, $status = null)
     {
         return $res->withJson($data, $status, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @param Request $req
+     * @param string $key
+     * @param bool $allowEmpty
+     * @return string
+     */
+    protected function requireParam(Request $req, $key, $allowEmpty = false)
+    {
+        $val = $req->getParam($key);
+        if ($val === null) {
+            throw new BadRequestException('parameter "' . $key . '" is missing');
+        }
+        if (!$allowEmpty && !$val) {
+            throw new BadRequestException('parameter "' . $key . '" is empty');
+        }
+        return $val;
     }
 
     /**
