@@ -90,6 +90,16 @@ class Workspace extends Model
         return $this->__tree;
     }
 
+    public function hasUser()
+    {
+        return !!$this->user_id;
+    }
+
+    public function getUser()
+    {
+        return new User($this->database, $this->user_id);
+    }
+
     /**
      * @throws \Exception
      */

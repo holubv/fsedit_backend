@@ -7,18 +7,21 @@ use Slim\Http\Response;
 
 class UserController extends Controller
 {
-    public function login(Request $req, Response $res)
+    /**
+     * @param Request $req
+     * @param Response $res
+     */
+    public function login($req, $res)
     {
-        $pdo = $this->database->pdo;
 
-        $tree = new FileTree($pdo);
+    }
 
-        $root = $tree->getRootNode();
+    /**
+     * @param Request $req
+     * @param Response $res
+     */
+    public function register($req, $res)
+    {
 
-
-        return $this->json($res, $tree->getDescendants(1));
-        //var_dump($tree->getRootNode(1));
-
-        //return $this->json($res, $tree->getAncestors(6));
     }
 }

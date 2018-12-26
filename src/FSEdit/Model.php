@@ -29,6 +29,7 @@ abstract class Model
     {
         $this->database = $database;
         if ($id !== null) {
+            $this->id = (int)$id;
             $this->loadById($id);
         }
     }

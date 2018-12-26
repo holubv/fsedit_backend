@@ -33,7 +33,8 @@ class StatusExceptionMiddleware
 
         return $res->withJson([
             'message' => $ex->getMessage(),
-            'status' => $ex->getStatus()
+            'status' => $ex->getStatus(),
+            'trace' => $ex->getTraceAsString() //todo hide in production
         ], $ex->getStatus(), JSON_PRETTY_PRINT);
     }
 
