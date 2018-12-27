@@ -48,7 +48,7 @@ abstract class Model
      * @param array $where
      * @return $this
      */
-    public function load($where)
+    protected function load($where)
     {
         if (static::$tableName === null) {
             throw new \InvalidArgumentException('table name is not defined');
@@ -65,4 +65,12 @@ abstract class Model
     }
 
     protected abstract function mapFields($result);
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 }

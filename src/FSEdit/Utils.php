@@ -11,7 +11,7 @@ class Utils
 
     /**
      * Generate a random string, using a cryptographically secure
-     * pseudorandom number generator (random_int)
+     * pseudo-random number generator (random_int)
      *
      * @param int $length required string length
      *

@@ -17,3 +17,8 @@ CREATE TABLE `x_request_limiter` (
   KEY `time` (`time`)
 )
 ```
+
+## todo
+
+- rate limiting
+- database error handling - throw exception on error
