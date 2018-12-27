@@ -1,10 +1,8 @@
--- we don't know how to generate schema fsedit (class Schema) :(
 create table users
 (
-  id       int auto_increment
-    primary key,
+  id       int auto_increment primary key,
   email    varchar(64) not null,
-  password varchar(64) null,
+  password char(60)    null,
   constraint users_email_uindex
   unique (email)
 );
@@ -24,8 +22,7 @@ create index sessions_token_index
 
 create table workspaces
 (
-  id         int auto_increment
-    primary key,
+  id         int auto_increment primary key,
   user_id    int                                   null,
   hash       char(14)                              not null,
   created    timestamp default current_timestamp() not null,
@@ -54,7 +51,8 @@ create table file_tree
   constraint file_tree_workspaces_id_fk
   foreign key (workspace_id) references workspaces (id)
     on delete cascade
-);
+)
+  charset = utf8;
 
 create index file_tree_level_index
   on file_tree (level);
