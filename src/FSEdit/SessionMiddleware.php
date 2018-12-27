@@ -35,6 +35,9 @@ class SessionMiddleware
      */
     public function __invoke($req, $res, $next)
     {
+        if ($req->isOptions()) {
+            return $next($req, $res);
+        }
         if (!$req->hasHeader(self::HEADER_NAME)) {
             return $next($req, $res);
         }
@@ -47,7 +50,7 @@ class SessionMiddleware
         /** @var Medoo $database */
         $database = $this->container['database'];
 
-        $r = $database->get('sessions', 'user_id', [
+        $r = $database->get('sessions', ['user_id'], [
             'token' => $token,
             'created[>]' => Medoo::raw('NOW() - INTERVAL 1 MONTH')
         ]);

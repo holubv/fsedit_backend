@@ -165,7 +165,7 @@ class FileController extends Controller
         }
 
         //check name duplicity
-        $existing = $this->database->get('file_tree', 'id', [
+        $existing = $this->database->get('file_tree', ['id'], [
             'workspace_id' => $workspace->getId(),
             'parent_id' => $parent,
             'name' => $name

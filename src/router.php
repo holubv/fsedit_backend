@@ -13,7 +13,7 @@ $app->add(new \FSEdit\SessionMiddleware($app));
 $app->add(function ($req, $res, $next) {
     return $next($req, $res
         ->withHeader('Access-Control-Allow-Origin', '*')
-        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization, Cache-Control, If-None-Match')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Api-Token, X-Requested-With, Content-Type, Accept, Origin, Authorization, Cache-Control, If-None-Match')
         ->withHeader('Access-Control-Expose-Headers', 'ETag, Cache-Control')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     );
@@ -32,9 +32,8 @@ $app->get('/file', FSEdit\FileController::class . ':readFile');
 $app->post('/workspaces/create', FSEdit\WorkspaceController::class . ':create');
 $app->get('/workspace/{workspace:[0-9a-zA-Z]+}', FSEdit\WorkspaceController::class . ':structure');
 
-$app->get('/users/login', FSEdit\UserController::class . ':login');
-$app->get('/users/register', FSEdit\UserController::class . ':register');
-$app->get('/users/logout', FSEdit\UserController::class . ':logout');
+$app->post('/users/login', FSEdit\UserController::class . ':login');
+$app->post('/users/register', FSEdit\UserController::class . ':register');
 
 $app->options('/{routes:.*}', function ($req, $res) {
     return $res;
