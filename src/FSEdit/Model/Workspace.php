@@ -2,6 +2,7 @@
 
 namespace FSEdit\Model;
 
+use FSEdit\Exception\ForbiddenException;
 use FSEdit\FileTree;
 use FSEdit\Utils;
 
@@ -130,7 +131,7 @@ class Workspace extends Model
     public function canReadEx()
     {
         if (!$this->canRead()) {
-            throw new \Exception('cannot read this workspace');
+            throw new ForbiddenException('cannot read this workspace');
         }
     }
 
@@ -150,7 +151,7 @@ class Workspace extends Model
     public function canWriteEx($user, $editToken = null)
     {
         if (!$this->canWrite($user, $editToken)) {
-            throw new \Exception('cannot write to this workspace');
+            throw new ForbiddenException('cannot write to this workspace');
         }
     }
 
