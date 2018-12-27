@@ -221,7 +221,7 @@ class FileController extends Controller
 
         $tree = $workspace->getFileTree();
 
-        $item = $this->database->get('file_tree', ['id'], [
+        $item = $this->database->get('file_tree', ['id', 'name'], [
             'id' => $itemId,
             'workspace_id' => $workspace->getId()
         ]);
@@ -242,6 +242,16 @@ class FileController extends Controller
 
         if (!$parent) {
             throw new NotFoundException('parent folder node not found');
+        }
+
+        //check name duplicity
+        $existing = $this->database->get('file_tree', ['id'], [
+            'workspace_id' => $workspace->getId(),
+            'parent_id' => (int)$parent['id'],
+            'name' => $item['name']
+        ]);
+        if ($existing) {
+            throw new ConflictException('item name already exists under this parent');
         }
 
         $tree->moveNodePlacementChildBottom((int)$item['id'], (int)$parent['id']);
