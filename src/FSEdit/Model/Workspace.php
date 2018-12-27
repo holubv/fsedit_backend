@@ -4,7 +4,6 @@ namespace FSEdit\Model;
 
 use FSEdit\FileTree;
 use FSEdit\Utils;
-use Medoo\Medoo;
 
 class Workspace extends Model
 {
@@ -36,27 +35,21 @@ class Workspace extends Model
     private $__tree = null;
 
     /**
-     * @param Medoo $database
-     * @return Workspace
-     * @throws \Exception
+     * @param int|null $userId
+     * @return $this
+     * @throws \StefanoTree\Exception\RootNodeAlreadyExistException
      */
-    public static function create($database)
+    public function create($userId = null)
     {
-        $hash = Utils::randomStr(14);
-        $editToken = Utils::randomSha1();
-
-        $database->insert('workspaces', [
-            'hash' => $hash,
-            'edit_token' => $editToken
+        $this->database->insert('workspaces', [
+            'user_id' => $userId,
+            'hash' => Utils::randomStr(14),
+            'edit_token' => $userId ? null : Utils::randomSha1()
         ]);
 
-        if ($database->error()[0] != 0) {
-            throw new \Exception('database error');
-        }
-
-        $workspace = new Workspace($database, $database->id());
-        $workspace->getFileTree()->createRootNode([], $workspace->id);
-        return $workspace;
+        $this->loadById($this->database->id());
+        $this->getFileTree()->createRootNode([], $this->id);
+        return $this;
     }
 
     /**
@@ -92,14 +85,43 @@ class Workspace extends Model
         return $this->__tree;
     }
 
+    /**
+     * @return bool
+     */
     public function hasUser()
     {
         return !!$this->user_id;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getUserId()
+    {
+        if ($this->user_id) {
+            return $this->user_id;
+        }
+        return null;
+    }
+
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return new User($this->database, $this->user_id);
+    }
+
+    /**
+     * @param User|null $user
+     * @return bool
+     */
+    public function isOwner($user)
+    {
+        if ($user && $user->getId() === $this->getUserId()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -121,21 +143,31 @@ class Workspace extends Model
     }
 
     /**
+     * @param User|null $user
+     * @param string|null $editToken
      * @throws \Exception
      */
-    public function canWriteEx()
+    public function canWriteEx($user, $editToken = null)
     {
-        if (!$this->canWrite()) {
+        if (!$this->canWrite($user, $editToken)) {
             throw new \Exception('cannot write to this workspace');
         }
     }
 
     /**
+     * @param User|null $user
+     * @param string|null $editToken
      * @return bool
      */
-    public function canWrite()
+    public function canWrite($user, $editToken = null)
     {
-        return true; //todo check permissions
+        if ($this->isOwner($user)) {
+            return true; //workspace owner
+        }
+        if ($editToken && $editToken === $this->getEditToken()) {
+            return true; //has edit token
+        }
+        return false;
     }
 
     /**

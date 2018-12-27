@@ -30,6 +30,11 @@ class User extends Model
         return $this->load(['email' => $email]);
     }
 
+    /**
+     * @param string $email
+     * @param string $password
+     * @return $this
+     */
     public function register($email, $password)
     {
         $hash = password_hash($password, PASSWORD_BCRYPT);
@@ -40,10 +45,16 @@ class User extends Model
             'email' => $email,
             'password' => $hash
         ]);
+        $this->id = $this->database->id();
         $this->email = $email;
         $this->passwordHash = $hash;
+        return $this;
     }
 
+    /**
+     * @param string $password
+     * @return bool
+     */
     public function comparePasswords($password)
     {
         return password_verify($password, $this->passwordHash);

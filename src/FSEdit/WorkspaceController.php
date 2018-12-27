@@ -3,7 +3,6 @@
 namespace FSEdit;
 
 use FSEdit\Exception\BadRequestException;
-use FSEdit\Model\Workspace;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -19,7 +18,8 @@ class WorkspaceController extends Controller
      */
     public function create(Request $req, Response $res, $args)
     {
-        $workspace = Workspace::create($this->database);
+        $userId = $this->getUserId();
+        $workspace = $this->Workspace()->create($userId);
 
         return $this->json($res, [
             'hash' => $workspace->getHash(),
@@ -44,10 +44,14 @@ class WorkspaceController extends Controller
         $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canReadEx();
 
+        $isOwner = $workspace->isOwner($this->user);
         $structure = $workspace->getStructure();
 
         if (count($structure) <= 1) {
-            return $this->json($res, []);
+            return $this->json($res, [
+                'owner' => $isOwner,
+                'structure' => []
+            ]);
         }
 
         self::cleanStructure($structure);
@@ -64,7 +68,10 @@ class WorkspaceController extends Controller
             $st = [];
         }
 
-        return $this->json($res, $st);
+        return $this->json($res, [
+            'owner' => $isOwner,
+            'structure' => $st
+        ]);
     }
 
     private static function cleanStructure(&$elements)

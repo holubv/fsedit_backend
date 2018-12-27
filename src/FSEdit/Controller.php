@@ -83,6 +83,17 @@ class Controller
         return $this->user;
     }
 
+    /**
+     * @return int|null
+     */
+    protected function getUserId()
+    {
+        if ($this->user) {
+            return $this->user->getId();
+        }
+        return null;
+    }
+
     protected function getDatabase()
     {
         return $this->database;

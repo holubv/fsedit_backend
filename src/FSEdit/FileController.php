@@ -33,7 +33,7 @@ class FileController extends Controller
         $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = $this->Workspace()->loadByHash($wHash);
-        $workspace->canWriteEx();
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
 
         $hash = Utils::randomSha1();
 
@@ -150,7 +150,7 @@ class FileController extends Controller
         $isFolder = $req->getParam('folder', false) === 'true';
 
         $workspace = $this->Workspace()->loadByHash($wHash);
-        $workspace->canWriteEx();
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
 
         $tree = $workspace->getFileTree();
         $rootId = (int)$workspace->getRootNode()['id'];
@@ -217,7 +217,7 @@ class FileController extends Controller
         $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = $this->Workspace()->loadByHash($wHash);
-        $workspace->canWriteEx();
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
 
         $tree = $workspace->getFileTree();
 
@@ -278,7 +278,7 @@ class FileController extends Controller
         $wHash = $this->requireParam($req, 'workspace');
 
         $workspace = $this->Workspace()->loadByHash($wHash);
-        $workspace->canWriteEx();
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
 
         $file = $this->database->get('file_tree', ['id', 'workspace_id', 'file'], [
             'id' => $fileId,
