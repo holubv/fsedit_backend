@@ -34,6 +34,7 @@ $app->get('/workspace/{workspace:[0-9a-zA-Z]+}', FSEdit\WorkspaceController::cla
 
 $app->post('/users/login', FSEdit\UserController::class . ':login');
 $app->post('/users/register', FSEdit\UserController::class . ':register');
+$app->post('/users/exists', FSEdit\UserController::class . ':exists');
 
 $app->options('/{routes:.*}', function ($req, $res) {
     return $res;

@@ -73,6 +73,28 @@ class UserController extends Controller
     }
 
     /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     */
+    public function exists($req, $res)
+    {
+        $email = trim($this->requireParam($req, 'email'));
+
+        if (!preg_match('/^[!-?A-~]+@[!-?A-~]+$/', $email) || strlen($email) > 64) {
+            throw new BadRequestException('invalid email');
+        }
+
+        try {
+            $this->User()->loadByEmail($email);
+            throw new ConflictException('user already registered');
+        } catch (NotFoundException $_) {
+        }
+
+        return $this->json($res, []); //status 200
+    }
+
+    /**
      * @param User $user
      * @return string
      */
