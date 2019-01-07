@@ -1,4 +1,7 @@
 .idea
 composer.phar
-/vendor/
-config/config.php
+phpDocumentor.phar
+/vendor
+/config/config.php
+/public/docs
+/cache
