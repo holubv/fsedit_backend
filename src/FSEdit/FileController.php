@@ -5,6 +5,7 @@ namespace FSEdit;
 use FSEdit\Exception\BadRequestException;
 use FSEdit\Exception\ConflictException;
 use FSEdit\Exception\NotFoundException;
+use FSEdit\Exception\SqlException;
 use Psr\Http\Message\UploadedFileInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -61,7 +62,7 @@ class FileController extends Controller
             }
             if (!$found) {
                 $skipScan = true; //path do not exists (or only part of it exists), create non-existing folders
-                $parent = $tree->addNodePlacementChildBottom($parent, ['name' => $folder]);
+                $parent = $tree->addNodeChild($parent, ['name' => $folder]);
             }
         }
 
@@ -74,7 +75,7 @@ class FileController extends Controller
             }
         }
         if (!$fileOverride) {
-            $tree->addNodePlacementChildBottom($parent, ['name' => $filename, 'file' => $hash]);
+            $tree->addNodeChild($parent, ['name' => $filename, 'file' => $hash]);
         }
 
         if (!$this->completeUpload($file, $hash)) {
@@ -237,7 +238,7 @@ class FileController extends Controller
         }
 
         if ($isFolder) {
-            $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name]);
+            $id = $tree->addNodeChild($parent, ['name' => $name]);
             return $this->json($res, [
                 'id' => (int)$id,
                 'name' => $name,
@@ -247,7 +248,7 @@ class FileController extends Controller
 
         $hash = Utils::randomSha1();
 
-        $id = $tree->addNodePlacementChildBottom($parent, ['name' => $name, 'file' => $hash]);
+        $id = $tree->addNodeChild($parent, ['name' => $name, 'file' => $hash]);
         if (!$this->completeUpload(null, $hash)) {
             throw new \Exception('cannot complete file upload');
         }
@@ -306,17 +307,7 @@ class FileController extends Controller
             throw new NotFoundException('parent folder node not found');
         }
 
-        //check name duplicity
-        $existing = $this->database->get('file_tree', ['id'], [
-            'workspace_id' => $workspace->getId(),
-            'parent_id' => (int)$parent['id'],
-            'name' => $item['name']
-        ]);
-        if ($existing) {
-            throw new ConflictException('item name already exists under this parent');
-        }
-
-        $tree->moveNodePlacementChildBottom((int)$item['id'], (int)$parent['id']);
+        $tree->moveNodeChild((int)$item['id'], (int)$parent['id']);
         return $this->json($res, []);
     }
 
@@ -338,14 +329,17 @@ class FileController extends Controller
         $workspace = $this->Workspace()->loadByHash($wHash);
         $workspace->canWriteEx($this->user, $req->getParam('edit'));
 
-        $result = $this->database->update('file_tree', ['name' => $name], [
-            'id' => $itemId,
-            'workspace_id' => $workspace->getId(),
-            'LIMIT' => 1
-        ]);
-
-        if (!$result->rowCount()) {
-            throw new NotFoundException('item not found');
+        try {
+            $this->database->update('file_tree', ['name' => $name], [
+                'id' => $itemId,
+                'workspace_id' => $workspace->getId(),
+                'LIMIT' => 1
+            ]);
+        } catch (SqlException $e) {
+            if ($e->isDuplicateError()) {
+                throw new ConflictException('item name already exists under this parent', $e);
+            }
+            throw $e;
         }
 
         return $this->json($res, []);

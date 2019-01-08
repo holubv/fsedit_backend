@@ -2,6 +2,8 @@
 
 namespace FSEdit;
 
+use FSEdit\Exception\ConflictException;
+use FSEdit\Exception\SqlException;
 use FSEdit\NestedSet\Adapter\Pdo;
 use StefanoTree\NestedSet;
 
@@ -60,5 +62,51 @@ class FileTree extends NestedSet
         }
         $sql .= ' ORDER BY ' . $adapter->addTableName($options->getLeftColumnName()) . ' ASC';
         return $adapter->executeSelectSQL($sql, $params);
+    }
+
+    /**
+     * @param int $target
+     * @param array $data
+     * @return int
+     */
+    public function addNodeChild($target, $data = [])
+    {
+        try {
+            $id = $this->addNodePlacementChildBottom($target, $data);
+        } catch (SqlException $e) {
+            $this->handleSqlException($e);
+        }
+        if ($id === false) {
+            throw new \RuntimeException('cannot create a new node child');
+        }
+        return $id;
+    }
+
+    /**
+     * @param SqlException $e
+     * @throws SqlException|ConflictException
+     */
+    private function handleSqlException($e)
+    {
+        if ($e->isDuplicateError()) {
+            throw new ConflictException('item already exists under this parent', $e);
+        }
+        throw $e;
+    }
+
+    /**
+     * @param int $source
+     * @param int $target
+     */
+    public function moveNodeChild($source, $target)
+    {
+        try {
+            $r = $this->moveNodePlacementChildBottom($source, $target);
+        } catch (SqlException $e) {
+            $this->handleSqlException($e);
+        }
+        if ($r === false) {
+            throw new \RuntimeException('cannot move node child');
+        }
     }
 }

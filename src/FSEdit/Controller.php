@@ -6,7 +6,6 @@ use FSEdit\Exception\BadRequestException;
 use FSEdit\Exception\UnauthorizedException;
 use FSEdit\Model\ModelFactory;
 use FSEdit\Model\User;
-use Medoo\Medoo;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -17,7 +16,7 @@ class Controller
 
     /** @var Container */
     protected $container;
-    /** @var Medoo */
+    /** @var DatabaseAdapter */
     protected $database = null;
 
     protected $config;

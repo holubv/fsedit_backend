@@ -2,6 +2,7 @@
 
 namespace FSEdit\NestedSet\Adapter;
 
+use FSEdit\Exception\SqlException;
 use StefanoTree\NestedSet\Adapter\AdapterInterface;
 use StefanoTree\NestedSet\NodeInfo;
 use StefanoTree\NestedSet\Options;
@@ -107,7 +108,7 @@ class Pdo implements AdapterInterface
         $stm = $this->getConnection()
             ->prepare($sql);
         if (!$stm->execute($params)) {
-            throw new \RuntimeException();
+            throw new SqlException($stm->errorInfo());
         }
     }
 
@@ -414,7 +415,7 @@ class Pdo implements AdapterInterface
         $stm = $this->getConnection()
             ->prepare($sql);
         if (!$stm->execute($params)) {
-            throw new \RuntimeException();
+            throw new SqlException($stm->errorInfo());
         }
         return $stm->fetchAll(\PDO::FETCH_ASSOC);
     }
