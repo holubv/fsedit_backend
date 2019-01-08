@@ -10,8 +10,18 @@ use Slim\Http\Response;
 
 class StatusExceptionMiddleware
 {
+    /**
+     * @var bool $debug
+     */
+    private $debug;
+
+    /**
+     * StatusExceptionMiddleware constructor.
+     * @param App $app
+     */
     public function __construct(App $app)
     {
+        $this->debug = $app->getContainer()->get('config')->debug;
     }
 
     /**
@@ -31,11 +41,16 @@ class StatusExceptionMiddleware
             $ex = new BadRequestException($e->getMessage(), $e);
         }
 
-        return $res->withJson([
+        $data = [
             'message' => $ex->getMessage(),
-            'status' => $ex->getStatus(),
-            'trace' => $ex->getTraceAsString() //todo hide in production
-        ], $ex->getStatus(), JSON_PRETTY_PRINT);
+            'status' => $ex->getStatus()
+        ];
+
+        if ($this->debug) {
+            $data['trace'] = $ex->getTraceAsString();
+        }
+
+        return $res->withJson($data, $ex->getStatus(), JSON_PRETTY_PRINT);
     }
 
 }
