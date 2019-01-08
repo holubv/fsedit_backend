@@ -81,13 +81,51 @@ class FileController extends Controller
             throw new \Exception('cannot complete file upload');
         }
 
-        Utils::convertFileToUTF8($this->getFilePath($hash)); //todo handle images
+        //Utils::convertFileToUTF8($this->getFilePath($hash)); //todo handle other encodings?
 
         return $this->json($res, [
             'parent' => $parent !== $rootId ? (int)$parent : null,
             'file' => $hash,
             'name' => $filename
         ]);
+    }
+
+    /**
+     * @param UploadedFileInterface|null $file
+     * @param $hash
+     * @return bool
+     */
+    private function completeUpload($file, $hash)
+    {
+        $pre = substr($hash, 0, 8);
+        $pre = chunk_split($pre, 2, '/');
+        $hash = substr($hash, 8);
+
+        $directory = ROOT . $this->config->uploadsDir;
+
+        $path = $directory . '/' . $pre;
+        if (!file_exists($path)) {
+            if (!mkdir($path, 0777, true)) {
+                return false;
+            }
+        }
+
+        if ($file) {
+            try {
+                $file->moveTo($path . $hash);
+            } catch (\Exception $e) {
+                return false;
+            }
+        } else {
+            $file = fopen($path . $hash, 'w');
+            if ($file !== false) {
+                fclose($file);
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -120,6 +158,16 @@ class FileController extends Controller
             throw new NotFoundException();
         }
 
+        $mime = \mime_content_type($path);
+
+        if ($req->getHeaderLine('Accept') === 'text/plain' || $req->getQueryParam('plaintext') === 'true') {
+            if (strpos($mime, 'text/plain') === false) {
+                return $res
+                    ->withHeader('Content-Type', $mime)
+                    ->withStatus(406);
+            }
+        }
+
         $eTag = md5_file($path);
 
         $presentETag = $req->getHeader('If-None-Match');
@@ -128,12 +176,22 @@ class FileController extends Controller
         }
 
         $fh = fopen($path, 'rb');
-        $stream = new Stream($fh);
         return $res
-            ->withHeader('Content-Type', 'text/plain')
             ->withHeader('ETag', $eTag)
-            //->withHeader('Content-Type', 'image/jpeg') //todo recognize images
-            ->withBody($stream);
+            ->withHeader('Content-Type', $mime)
+            ->withBody(new Stream($fh));
+    }
+
+    /**
+     * @param string $hash
+     * @return string
+     */
+    private function getFilePath($hash)
+    {
+        $pre = substr($hash, 0, 8);
+        $pre = chunk_split($pre, 2, '/');
+        $hash = substr($hash, 8);
+        return ROOT . $this->config->uploadsDir . '/' . $pre . $hash;
     }
 
     /**
@@ -298,55 +356,5 @@ class FileController extends Controller
         }
 
         return $this->json($res, []);
-    }
-
-    /**
-     * @param string $hash
-     * @return string
-     */
-    private function getFilePath($hash)
-    {
-        $pre = substr($hash, 0, 8);
-        $pre = chunk_split($pre, 2, '/');
-        $hash = substr($hash, 8);
-        return ROOT . $this->config->uploadsDir . '/' . $pre . $hash;
-    }
-
-    /**
-     * @param UploadedFileInterface|null $file
-     * @param $hash
-     * @return bool
-     */
-    private function completeUpload($file, $hash)
-    {
-        $pre = substr($hash, 0, 8);
-        $pre = chunk_split($pre, 2, '/');
-        $hash = substr($hash, 8);
-
-        $directory = ROOT . $this->config->uploadsDir;
-
-        $path = $directory . '/' . $pre;
-        if (!file_exists($path)) {
-            if (!mkdir($path, 0777, true)) {
-                return false;
-            }
-        }
-
-        if ($file) {
-            try {
-                $file->moveTo($path . $hash);
-            } catch (\Exception $e) {
-                return false;
-            }
-        } else {
-            $file = fopen($path . $hash, 'w');
-            if ($file !== false) {
-                fclose($file);
-            } else {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

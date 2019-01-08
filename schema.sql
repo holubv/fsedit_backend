@@ -39,18 +39,18 @@ create table file_tree
 (
   id           int auto_increment
     primary key,
-  workspace_id int         not null,
-  lft          int         not null,
-  rgt          int         not null,
-  parent_id    int         null,
-  level        int         null,
-  name         varchar(64) null,
-  file         char(40)    null,
+  workspace_id int          not null,
+  lft          int          not null,
+  rgt          int          not null,
+  parent_id    int          null,
+  level        int          null,
+  name         varchar(128) null,
+  file         char(40)     null,
   constraint file_tree_file_uindex
-  unique (file),
+    unique (file),
   constraint file_tree_workspaces_id_fk
-  foreign key (workspace_id) references workspaces (id)
-    on delete cascade
+    foreign key (workspace_id) references workspaces (id)
+      on delete cascade
 )
   charset = utf8;
 

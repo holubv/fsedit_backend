@@ -10,7 +10,8 @@
     "paragonie/random_compat": "^2.0",
     "neitanod/forceutf8": "~2.0",
     "ext-pdo": "*",
-    "ext-iconv": "*"
+    "ext-iconv": "*",
+    "ext-fileinfo": "*"
   },
   "autoload": {
     "psr-4": {

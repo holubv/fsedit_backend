@@ -14,7 +14,7 @@ $app->add(function ($req, $res, $next) {
     return $next($req, $res
         ->withHeader('Access-Control-Allow-Origin', '*')
         ->withHeader('Access-Control-Allow-Headers', 'X-Api-Token, X-Requested-With, Content-Type, Accept, Origin, Authorization, Cache-Control, If-None-Match')
-        ->withHeader('Access-Control-Expose-Headers', 'ETag, Cache-Control')
+        ->withHeader('Access-Control-Expose-Headers', 'ETag, Cache-Control, X-Content-Type')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     );
 });
