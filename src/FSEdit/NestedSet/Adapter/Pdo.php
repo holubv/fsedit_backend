@@ -106,7 +106,9 @@ class Pdo implements AdapterInterface
     {
         $stm = $this->getConnection()
             ->prepare($sql);
-        $stm->execute($params);
+        if (!$stm->execute($params)) {
+            throw new \RuntimeException();
+        }
     }
 
     /**
@@ -411,7 +413,9 @@ class Pdo implements AdapterInterface
     {
         $stm = $this->getConnection()
             ->prepare($sql);
-        $stm->execute($params);
+        if (!$stm->execute($params)) {
+            throw new \RuntimeException();
+        }
         return $stm->fetchAll(\PDO::FETCH_ASSOC);
     }
 
