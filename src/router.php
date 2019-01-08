@@ -25,6 +25,7 @@ $app->put('/files/create', FSEdit\FileController::class . ':create');
 $app->put('/files/move', FSEdit\FileController::class . ':move');
 $app->put('/files/rename', FSEdit\FileController::class . ':rename');
 $app->put('/files/edit', FSEdit\FileController::class . ':edit');
+$app->post('/files/delete', FSEdit\FileController::class . ':delete');
 
 $app->get('/file/{file:[0-9a-fA-F]+}', FSEdit\FileController::class . ':readFile');
 $app->get('/file', FSEdit\FileController::class . ':readFile');

@@ -331,6 +331,47 @@ class FileController extends Controller
      * @return Response
      * @throws \Exception
      */
+    public function delete(Request $req, Response $res)
+    {
+        $itemId = (int)$req->getParam('id');
+        if ($itemId <= 0) {
+            throw new BadRequestException('invalid item id');
+        }
+
+        $wHash = $this->requireParam($req, 'workspace');
+
+        $workspace = $this->Workspace()->loadByHash($wHash);
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
+
+        $item = $this->database->get('file_tree', ['id', 'name'], [
+            'id' => $itemId,
+            'workspace_id' => $workspace->getId()
+        ]);
+        if (!$item) {
+            throw new NotFoundException('item not found');
+        }
+
+        $tree = $workspace->getFileTree();
+        $items = $tree->getDescendants($itemId);
+
+        $tree->deleteBranch($itemId);
+
+        foreach ($items as $i) {
+            if ($i['file']) {
+                $path = $this->getFilePath($i['file']);
+                unlink($path);
+            }
+        }
+
+        return $this->json($res, []);
+    }
+
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
     public function edit(Request $req, Response $res)
     {
         $fileId = (int)$req->getParam('file');
