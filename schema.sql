@@ -4,7 +4,7 @@ create table users
   email    varchar(64) not null,
   password char(60)    null,
   constraint users_email_uindex
-  unique (email)
+    unique (email)
 );
 
 create table sessions
@@ -13,8 +13,8 @@ create table sessions
   token   char(64)                              not null,
   created timestamp default current_timestamp() not null,
   constraint sessions_users_id_fk
-  foreign key (user_id) references users (id)
-    on delete cascade
+    foreign key (user_id) references users (id)
+      on delete cascade
 );
 
 create index sessions_token_index
@@ -26,13 +26,13 @@ create table workspaces
   user_id    int                                   null,
   hash       char(14)                              not null,
   created    timestamp default current_timestamp() not null,
-  private    tinyint default 0                     null,
+  private    tinyint   default 0                   null,
   edit_token char(40)                              null,
   constraint workspaces_hash_uindex
-  unique (hash),
+    unique (hash),
   constraint workspaces_users_id_fk
-  foreign key (user_id) references users (id)
-    on delete cascade
+    foreign key (user_id) references users (id)
+      on delete cascade
 );
 
 create table file_tree
@@ -48,6 +48,8 @@ create table file_tree
   file         char(40)     null,
   constraint file_tree_file_uindex
     unique (file),
+  constraint file_tree_workspace_id_parent_id_name_uindex
+    unique (workspace_id, parent_id, name),
   constraint file_tree_workspaces_id_fk
     foreign key (workspace_id) references workspaces (id)
       on delete cascade
