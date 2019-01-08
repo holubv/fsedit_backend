@@ -180,6 +180,10 @@ class FileController extends Controller
             return $res->withStatus(304);
         }
 
+        if ($req->getQueryParam('download')) {
+            $res = $res->withHeader('Content-Disposition', 'attachment; filename="' . Utils::safeFilename($node['name']) . '"');
+        }
+
         $fh = fopen($path, 'rb');
         return $res
             ->withHeader('ETag', $eTag)

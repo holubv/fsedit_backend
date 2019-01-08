@@ -70,4 +70,9 @@ class Utils
         }
         return true;
     }
+
+    public static function safeFilename($name)
+    {
+        return \preg_replace('/[^0-9a-zA-Z_\-.]/', '_', $name);
+    }
 }
