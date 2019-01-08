@@ -320,9 +320,35 @@ class FileController extends Controller
         return $this->json($res, []);
     }
 
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
     public function rename(Request $req, Response $res)
     {
+        $itemId = (int)$req->getParam('id');
+        if ($itemId <= 0) {
+            throw new BadRequestException('invalid item id');
+        }
+        $name = $this->requireParam($req, 'name');
+        $wHash = $this->requireParam($req, 'workspace');
 
+        $workspace = $this->Workspace()->loadByHash($wHash);
+        $workspace->canWriteEx($this->user, $req->getParam('edit'));
+
+        $result = $this->database->update('file_tree', ['name' => $name], [
+            'id' => $itemId,
+            'workspace_id' => $workspace->getId(),
+            'LIMIT' => 1
+        ]);
+
+        if (!$result->rowCount()) {
+            throw new NotFoundException('item not found');
+        }
+
+        return $this->json($res, []);
     }
 
     /**
