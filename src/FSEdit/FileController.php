@@ -160,6 +160,10 @@ class FileController extends Controller
 
         $mime = \mime_content_type($path);
 
+        if ($mime === 'inode/x-empty') {
+            $mime = 'text/plain';
+        }
+
         if ($req->getHeaderLine('Accept') === 'text/plain' || $req->getQueryParam('plaintext') === 'true') {
             if (strpos($mime, 'text/plain') === false) {
                 return $res
