@@ -82,7 +82,10 @@ class FileController extends Controller
             throw new \Exception('cannot complete file upload');
         }
 
-        //Utils::convertFileToUTF8($this->getFilePath($hash)); //todo handle other encodings?
+        $path = $this->getFilePath($hash);
+        if (strpos(\mime_content_type($path), 'text/') === 0) {
+            Utils::convertFileToUTF8($path);
+        }
 
         return $this->json($res, [
             'parent' => $parent !== $rootId ? (int)$parent : null,
@@ -166,7 +169,7 @@ class FileController extends Controller
         }
 
         if ($req->getHeaderLine('Accept') === 'text/plain' || $req->getQueryParam('plaintext') === 'true') {
-            if (strpos($mime, 'text/plain') === false) {
+            if (strpos($mime, 'text/') !== 0) {
                 return $res
                     ->withHeader('Content-Type', $mime)
                     ->withStatus(406);
