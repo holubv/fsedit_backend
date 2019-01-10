@@ -22,6 +22,11 @@ class User extends Model
     private $session = false;
 
     /**
+     * @var string|null $token
+     */
+    private $token = null;
+
+    /**
      * @param string $email
      * @return $this
      */
@@ -74,6 +79,22 @@ class User extends Model
     public function isSession()
     {
         return $this->session;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param string|null $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
     }
 
     /**

@@ -63,6 +63,7 @@ class SessionMiddleware
 
         $user = new User($database, $id);
         $user->markAsSession();
+        $user->setToken($token);
 
         $this->container['user'] = $user;
 

@@ -77,6 +77,24 @@ class UserController extends Controller
      * @param Response $res
      * @return Response
      */
+    public function logout($req, $res)
+    {
+        $user = $this->requireUser();
+
+        $this->database->delete('sessions', [
+            'user_id' => $user->getId(),
+            'token' => $user->getToken(),
+            'LIMIT' => 1
+        ]);
+
+        return $this->json($res, []);
+    }
+
+    /**
+     * @param Request $req
+     * @param Response $res
+     * @return Response
+     */
     public function exists($req, $res)
     {
         $email = trim($this->requireParam($req, 'email'));

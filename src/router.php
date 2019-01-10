@@ -35,6 +35,7 @@ $app->get('/workspaces/list', FSEdit\WorkspaceController::class . ':listWorkspac
 $app->get('/workspace/{workspace:[0-9a-zA-Z]+}', FSEdit\WorkspaceController::class . ':structure');
 
 $app->post('/users/login', FSEdit\UserController::class . ':login');
+$app->post('/users/logout', FSEdit\UserController::class . ':logout');
 $app->post('/users/register', FSEdit\UserController::class . ':register');
 $app->post('/users/exists', FSEdit\UserController::class . ':exists');
 
