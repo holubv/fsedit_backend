@@ -30,6 +30,30 @@ class WorkspaceController extends Controller
     /**
      * @param Request $req
      * @param Response $res
+     * @return Response
+     * @throws \Exception
+     */
+    public function listWorkspaces(Request $req, Response $res)
+    {
+        $user = $this->requireUser();
+
+        $data = $this->database->query(
+            ' select workspaces.id, hash, created, count(*) as count, GROUP_CONCAT(name SEPARATOR \', \') as files
+              from workspaces
+              join file_tree on workspaces.id = file_tree.workspace_id
+              where user_id = :user_id and file_tree.name is not null and file_tree.lft > 1
+              group by workspaces.id
+              order by id desc
+              limit 10;',
+            [':user_id' => $user->getId()]
+        )->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $this->json($res, $data);
+    }
+
+    /**
+     * @param Request $req
+     * @param Response $res
      * @param array $args
      * @return Response
      * @throws \Exception
@@ -77,9 +101,9 @@ class WorkspaceController extends Controller
     private static function cleanStructure(&$elements)
     {
         foreach ($elements as &$element) {
-            $element['id'] = (int) $element['id'];
-            $element['parent_id'] = (int) $element['parent_id'];
-            $element['level'] = (int) $element['level'];
+            $element['id'] = (int)$element['id'];
+            $element['parent_id'] = (int)$element['parent_id'];
+            $element['level'] = (int)$element['level'];
             unset($element['lft']);
             unset($element['rgt']);
             unset($element['workspace_id']);

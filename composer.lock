@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "a4160f0231a99237becbaea505cb62ba",
+  "content-hash": "f1cee076957fb7b35fa41603156ab694",
   "packages": [
     {
       "name": "catfan/medoo",
@@ -293,17 +293,98 @@
       "time": "2018-02-13T20:26:39+00:00"
     },
     {
-      "name": "paragonie/random_compat",
-      "version": "v2.0.17",
+      "name": "nlp-tools/lang-detect",
+      "version": "dev-master",
       "source": {
         "type": "git",
-        "url": "https://github.com/paragonie/random_compat.git",
-        "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d"
+        "url": "https://github.com/angeloskath/php-sourceclassifier.git",
+        "reference": "34cef70fa118a844eb0d130785090dc914125dc6"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/paragonie/random_compat/zipball/29af24f25bab834fcbb38ad2a69fa93b867e070d",
-        "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d",
+        "url": "https://api.github.com/repos/angeloskath/php-sourceclassifier/zipball/34cef70fa118a844eb0d130785090dc914125dc6",
+        "reference": "34cef70fa118a844eb0d130785090dc914125dc6",
+        "shasum": ""
+      },
+      "require": {
+        "nlp-tools/nlp-tools": "dev-develop"
+      },
+      "type": "library",
+      "autoload": {
+        "psr-0": {
+          "": "src"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "WTFPL"
+      ],
+      "authors": [
+        {
+          "name": "Angelos Katharopoulos",
+          "email": "katharas@gmail.com"
+        }
+      ],
+      "description": "Classify source code using a Naive Bayes text classifier",
+      "time": "2013-11-13T22:29:17+00:00"
+    },
+    {
+      "name": "nlp-tools/nlp-tools",
+      "version": "dev-develop",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/angeloskath/php-nlp-tools.git",
+        "reference": "56f6d4551d0fb1cad98ce6f533362283bbdd3bf6"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/angeloskath/php-nlp-tools/zipball/56f6d4551d0fb1cad98ce6f533362283bbdd3bf6",
+        "reference": "56f6d4551d0fb1cad98ce6f533362283bbdd3bf6",
+        "shasum": ""
+      },
+      "require": {
+        "php": ">=5.3"
+      },
+      "type": "library",
+      "extra": {
+        "branch-alias": {
+          "dev-master": "1.0.x-dev"
+        }
+      },
+      "autoload": {
+        "psr-0": {
+          "NlpTools\\": "src/"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "WTFPL"
+      ],
+      "authors": [
+        {
+          "name": "Angelos Katharopoulos",
+          "email": "angelos@yourse.gr"
+        }
+      ],
+      "description": "NlpTools is a set of php 5.3+ classes for beginner to semi advanced natural language processing work.",
+      "keywords": [
+        "machine learning",
+        "nlp"
+      ],
+      "time": "2016-08-30T21:00:25+00:00"
+    },
+    {
+      "name": "paragonie/random_compat",
+      "version": "v2.0.18",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/paragonie/random_compat.git",
+        "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/paragonie/random_compat/zipball/0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
+        "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
         "shasum": ""
       },
       "require": {
@@ -339,7 +420,7 @@
         "pseudorandom",
         "random"
       ],
-      "time": "2018-07-04T16:31:37+00:00"
+      "time": "2019-01-03T20:59:08+00:00"
     },
     {
       "name": "pimple/pimple",
@@ -732,14 +813,18 @@
   "packages-dev": [],
   "aliases": [],
   "minimum-stability": "stable",
-  "stability-flags": [],
+  "stability-flags": {
+    "nlp-tools/nlp-tools": 20,
+    "nlp-tools/lang-detect": 20
+  },
   "prefer-stable": false,
   "prefer-lowest": false,
   "platform": {
     "php": ">=5.6.0",
     "ext-json": "*",
     "ext-pdo": "*",
-    "ext-iconv": "*"
+    "ext-iconv": "*",
+    "ext-fileinfo": "*"
   },
   "platform-dev": []
 }

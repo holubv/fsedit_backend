@@ -9,6 +9,8 @@
     "stefano/stefano-tree": "^2.0",
     "paragonie/random_compat": "^2.0",
     "neitanod/forceutf8": "~2.0",
+    "nlp-tools/nlp-tools": "dev-develop#56f6d4551d0fb1cad98ce6f533362283bbdd3bf6",
+    "nlp-tools/lang-detect": "dev-master#34cef70fa118a844eb0d130785090dc914125dc6",
     "ext-pdo": "*",
     "ext-iconv": "*",
     "ext-fileinfo": "*"
