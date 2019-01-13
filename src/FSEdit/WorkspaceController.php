@@ -37,16 +37,29 @@ class WorkspaceController extends Controller
     {
         $user = $this->requireUser();
 
+        $page = $req->getParam('page', 0);
+
+        $this->database->query('set session group_concat_max_len = 126;');
         $data = $this->database->query(
-            ' select workspaces.id, hash, created, count(*) as count, GROUP_CONCAT(name SEPARATOR \', \') as files
+            ' select workspaces.id, hash, created, count(*) as count, GROUP_CONCAT(file separator \'$$$\') as files
               from workspaces
-              join file_tree on workspaces.id = file_tree.workspace_id
-              where user_id = :user_id and file_tree.name is not null and file_tree.lft > 1
+                join file_tree on workspaces.id = file_tree.workspace_id
+              where user_id = :user_id
+                and file_tree.name is not null
+                and file_tree.lft > 1
               group by workspaces.id
-              order by id desc
-              limit 10;',
-            [':user_id' => $user->getId()]
+              order by workspaces.id desc, file_tree.id desc
+              limit :per_page offset :off;',
+            [
+                ':user_id' => $user->getId(),
+                ':per_page' => 3,
+                ':off' => $page * 3
+            ]
         )->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($data as &$row) {
+            $row['files'] = explode('$$$', $row['files']);
+        }
 
         return $this->json($res, $data);
     }
