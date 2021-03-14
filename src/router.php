@@ -1,5 +1,15 @@
 <?php
 
+//$app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app, [
+//    new \Whoops\Handler\JsonResponseHandler(),
+//    new \Whoops\Handler\PlainTextHandler(), //fixme json response handler
+//]));
+
+$app->add(new \FSEdit\DatabaseMiddleware($app));
+$app->add(new \FSEdit\StatusExceptionMiddleware($app));
+
+$app->add(new \FSEdit\SessionMiddleware($app));
+
 $app->add(function ($req, $res, $next) {
     return $next($req, $res
         ->withHeader('Access-Control-Allow-Origin', '*')
@@ -8,16 +18,6 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     );
 });
-
-$app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app, [
-    new \Whoops\Handler\JsonResponseHandler(),
-    new \Whoops\Handler\PlainTextHandler(), //fixme json response handler
-]));
-
-$app->add(new \FSEdit\DatabaseMiddleware($app));
-$app->add(new \FSEdit\StatusExceptionMiddleware($app));
-
-$app->add(new \FSEdit\SessionMiddleware($app));
 
 $app->map(['post', 'options'], '/files/upload', FSEdit\FileController::class . ':upload');
 $app->put('/files/create', FSEdit\FileController::class . ':create');
