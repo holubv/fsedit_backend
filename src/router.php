@@ -1,5 +1,14 @@
 <?php
 
+$app->add(function ($req, $res, $next) {
+    return $next($req, $res
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Api-Token, X-Requested-With, Content-Type, Accept, Origin, Authorization, Cache-Control, If-None-Match')
+        ->withHeader('Access-Control-Expose-Headers', 'ETag, Cache-Control, X-Content-Type')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+    );
+});
+
 $app->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware($app, [
     new \Whoops\Handler\JsonResponseHandler(),
     new \Whoops\Handler\PlainTextHandler(), //fixme json response handler
@@ -9,15 +18,6 @@ $app->add(new \FSEdit\DatabaseMiddleware($app));
 $app->add(new \FSEdit\StatusExceptionMiddleware($app));
 
 $app->add(new \FSEdit\SessionMiddleware($app));
-
-$app->add(function ($req, $res, $next) {
-    return $next($req, $res
-        ->withHeader('Access-Control-Allow-Origin', '*')
-        ->withHeader('Access-Control-Allow-Headers', 'X-Api-Token, X-Requested-With, Content-Type, Accept, Origin, Authorization, Cache-Control, If-None-Match')
-        ->withHeader('Access-Control-Expose-Headers', 'ETag, Cache-Control, X-Content-Type')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-    );
-});
 
 $app->map(['post', 'options'], '/files/upload', FSEdit\FileController::class . ':upload');
 $app->put('/files/create', FSEdit\FileController::class . ':create');
